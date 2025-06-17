@@ -1,0 +1,63 @@
+.timeContainer {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 0px;
+    height: calc(100vh - 64px);
+}
+
+.timeSection {
+    width: 50%;
+    padding: 30px;
+    border: 2px solid #ccc;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+    justify-content: center;
+    text-align: center;
+    min-width: 500px;
+}
+
+.timeSection h2 {
+    margin-top: -10px;
+    text-align: left;
+    color: #ccc;
+}
+
+.clockDisplay {
+  font-size: 6rem;
+  font-weight: bold;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clockDigit {
+  margin: 0 2px;
+  animation: digitFade 0.4s ease-in;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.3)
+}
+
+.clockColon {
+  animation: blink 1s steps(2, start) infinite;
+  margin: 0 5px;
+  color: #ccc;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes digitFade {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
