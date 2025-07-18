@@ -74,7 +74,7 @@ export default function Navbar() {
 					<div className="hidden md:flex">
 						{user ? (
 							<>
-								<span className="text-black">Hello, {user.username}!</span>
+								<span className="text-black">Hello, {user.display_name}!</span>
 								<button
 									onClick={handleLogout}
 									className="text-gray-700 hover:text-red-600 transition"

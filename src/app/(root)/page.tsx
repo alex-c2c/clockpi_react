@@ -11,7 +11,7 @@ export default function App() {
 		<>
 			<h1>Home</h1>
 			{user ? (
-				<p>Welcome {user.username}</p>
+				<p>Welcome {user.display_name}</p>
 			) : (
 				<p>not logged in!</p>
 			)

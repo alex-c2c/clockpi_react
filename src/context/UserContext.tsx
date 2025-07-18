@@ -4,7 +4,8 @@ import React, { createContext, useContext, useState } from 'react'
 
 
 type User = {
-	username: string
+	username: string,
+	display_name: string
 }
 
 const UserContext = createContext<{

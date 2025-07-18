@@ -34,6 +34,7 @@ export default function LoginPage() {
 				router.push(redirectPath);
 			}
 			else {
+				setUser(null);
 				setError(data.message || "Login failed");
 			}
 		}
