@@ -4,14 +4,14 @@ import React, { createContext, useContext, useState } from 'react'
 
 
 type User = {
-	username: string | null
+	username: string
 }
 
 const UserContext = createContext<{
-	user: User
-	setUser: React.Dispatch<React.SetStateAction<User>>
+	user: User | null
+	setUser: React.Dispatch<React.SetStateAction<User|null>>
 }>({
-	user: { username: null },
+	user: null,
 	setUser: () => { },
 })
 
@@ -24,11 +24,11 @@ export const UserProvider = ({
 	children: React.ReactNode
 	initialUser: User
 }) => {
-	const [user, setUser] = useState<User>(initialUser)
+	const [user, setUser] = useState<User|null>(initialUser)
 
 	return (
-		<UserContext.Provider value={{ user, setUser }}>
+		<UserContext value={{ user, setUser }}>
 			{children}
-		</UserContext.Provider>
+		</UserContext>
 	)
 }

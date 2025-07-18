@@ -30,8 +30,7 @@ export default function LoginPage() {
 
 			const data = await res.json();
 			if (res.ok) {
-				//setUser(data.user);
-				setUser({ username: data.username })
+				setUser(data.user)
 				router.push(redirectPath);
 			}
 			else {

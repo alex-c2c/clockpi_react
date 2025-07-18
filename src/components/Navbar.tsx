@@ -20,7 +20,7 @@ export default function Navbar() {
 			});
 
 			if (res.ok) {
-				setUser({ username: null })
+				setUser(null);
 				router.push("/");
 			}
 		}
