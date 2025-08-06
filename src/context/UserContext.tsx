@@ -1,7 +1,6 @@
-'use client'
+"use client"
 
-import React, { createContext, useContext, useState } from 'react'
-
+import React, { createContext, useContext, useState } from "react"
 
 type User = {
 	username: string,
@@ -10,7 +9,7 @@ type User = {
 
 const UserContext = createContext<{
 	user: User | null
-	setUser: React.Dispatch<React.SetStateAction<User|null>>
+	setUser: React.Dispatch<React.SetStateAction<User | null>>
 }>({
 	user: null,
 	setUser: () => { },
@@ -25,7 +24,7 @@ export const UserProvider = ({
 	children: React.ReactNode
 	initialUser: User
 }) => {
-	const [user, setUser] = useState<User|null>(initialUser)
+	const [user, setUser] = useState<User | null>(initialUser)
 
 	return (
 		<UserContext value={{ user, setUser }}>

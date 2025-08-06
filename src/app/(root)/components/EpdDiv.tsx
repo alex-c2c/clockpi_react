@@ -1,0 +1,55 @@
+"use client";
+
+export default function EpdDiv() {
+
+	const handleRefreshButton = async () => {
+		try {
+
+			const res = await fetch("/api/epd/refresh", {
+				method: "GET",
+				credentials: "include",
+			});
+
+			if (!res.ok) {
+				console.error("EPD refresh failed");
+			}
+		}
+		catch (err) {
+			console.error("Error calling /api/epd/refresh", err);
+		}
+	};
+
+	const handleClearButton = async () => {
+		try {
+
+			const res = await fetch("/api/epd/clear", {
+				method: "GET",
+				credentials: "include",
+			});
+
+			if (!res.ok) {
+				console.error("EPD clear failed");
+			}
+		}
+		catch (err) {
+			console.error("Error calling /api/epd/clear", err);
+		}
+	};
+
+	return (
+		<div className="w-[640px] bg-stone-800 rounded-2xl p-6 flex flex-col justify-center">
+			<h2 className="text-xl text-white mb-2 self-start uppercase tracking-widest font-extrabold">
+				E-Paper Display
+			</h2>
+			<div className="w-full h-px bg-white opacity-30 mb-6" />
+			<div className="flex gap-8">
+				<button onClick={handleRefreshButton} className="w-1/2 h-[50px] bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-2xl font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700" >
+					Refresh EPD
+				</button>
+				<button onClick={handleClearButton} className="w-1/2 h-[50px] aspect-[16/4] bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-2xl font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700">
+					Clear EPD
+				</button>
+			</div>
+		</div>
+	);
+}
