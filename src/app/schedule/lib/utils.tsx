@@ -1,4 +1,4 @@
-import { DAYS_OF_WEEK } from "@/app/sleep/lib/consts";
+import { DAYS_OF_WEEK } from "@/app/schedule/lib/consts";
 
 function checkTimeValidity(hour: number, minute: number): string | null {
 	if (hour === null || hour < 0 || hour > 23) {

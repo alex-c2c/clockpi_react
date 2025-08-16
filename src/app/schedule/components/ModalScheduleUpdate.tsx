@@ -1,23 +1,25 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { SleepProps } from "@/app/sleep/types/Sleep";
-import { DAYS_OF_WEEK } from "@/app/sleep/lib/consts";
-import { fetchSleepDelete, fetchSleepUpdate } from "@/app/sleep/lib/api";
-import { getEndTime } from "@/app/sleep/lib/utils";
+import { ScheduleProps } from "@/app/schedule/types/Schedule";
+import { DAYS_OF_WEEK } from "@/app/schedule/lib/consts";
+import { fetchScheduleDelete, fetchScheduleUpdate } from "@/app/schedule/lib/api";
+import { checkDataValidity, getEndTime } from "@/app/schedule/lib/utils";
 
-export default function ModalSleepUpdate({
-	selectedSleep,
-	setIsOpen
+export default function ModalScheduleUpdate({
+	selectedSchedule,
+	setIsOpen,
+	setIsFetchSchedules
 }: {
-	selectedSleep: SleepProps,
-	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+	selectedSchedule: ScheduleProps,
+	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
+	setIsFetchSchedules: React.Dispatch<React.SetStateAction<boolean>>
 }) {
-	const [id] = useState<number>(selectedSleep.id);
-	const [startTime, setStartTime] = useState<string>(selectedSleep.startTime);
+	const [id] = useState<number>(selectedSchedule.id);
+	const [startTime, setStartTime] = useState<string>(selectedSchedule.startTime);
 	const [endTime, setEndTime] = useState<string>("12:01");
-	const [duration, setDuration] = useState<number>(selectedSleep.duration);
-	const [days, setDays] = useState<string[]>(selectedSleep.days);
+	const [duration, setDuration] = useState<number>(selectedSchedule.duration);
+	const [days, setDays] = useState<string[]>(selectedSchedule.days);
 	const [error, setError] = useState("");
 
 	const toggleDay = (day: string) => {
@@ -33,7 +35,20 @@ export default function ModalSleepUpdate({
 	}
 
 	const handleClickUpdate = async () => {
-		const newSleep: SleepProps = {
+		// cheeck ID before fetching API
+		if (id == null) {
+			setError("Invalid or missing ID");
+			return;
+		}
+		
+		// validate data before fetching API
+		const dataError: string | null = checkDataValidity(startTime, duration, days);
+		if (dataError != null) {
+			setError(dataError);
+			return;
+		}
+
+		const currentSchedule: ScheduleProps = {
 			id: id,
 			startTime: startTime,
 			duration: duration,
@@ -41,11 +56,25 @@ export default function ModalSleepUpdate({
 			isEnabled: true
 		};
 
-		fetchSleepUpdate(newSleep, setIsOpen, setError);
+		const err: string = await fetchScheduleUpdate(currentSchedule);		
+		if (!err) {
+			setIsOpen(false);
+			setIsFetchSchedules(true);
+		}
+		else {
+			setError(err);
+		}
 	};
 
 	const handleClickDelete = async () => {
-		fetchSleepDelete(id, setIsOpen, setError);
+		const err: string = await fetchScheduleDelete(id);		
+		if (!err) {
+			setIsOpen(false);
+			setIsFetchSchedules(true);
+		}
+		else{
+			setError(err);
+		}
 	}
 
 	useEffect(() => {

@@ -1,4 +1,4 @@
-export type SleepProps = {
+export type ScheduleProps = {
 	id: number;
 	startTime: string;
 	duration: number;

@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-
+import fetchSessionUser from "./lib/api"
+import { User } from "@/types/User";
 
 export async function middleware(request: NextRequest) {
-	console.log("🛡 Middleware executing for:", request.nextUrl.pathname)
+	console.debug("🛡 Middleware executing for:", request.nextUrl.pathname)
+	const user: User | null = await fetchSessionUser()
 
-	const session = request.cookies.get("session")
-
-	if (!session) {
+	if (!user) {
 		const loginUrl = new URL("/login", request.url)
 		loginUrl.searchParams.set("redirect", request.nextUrl.pathname)
 		return NextResponse.redirect(loginUrl)

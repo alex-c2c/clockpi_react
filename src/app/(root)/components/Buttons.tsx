@@ -2,11 +2,11 @@
 
 import { useRouter } from "next/navigation";
 
-export function ButtonSleepEdit() {
+export function ButtonScheduleEdit() {
 	const router = useRouter();
 
 	const handleClick = async () => {
-		router.push("/sleep");
+		router.push("/schedule");
 	};
 
 	return (

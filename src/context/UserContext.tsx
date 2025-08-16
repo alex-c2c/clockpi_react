@@ -1,11 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState } from "react"
-
-type User = {
-	username: string,
-	display_name: string
-}
+import { User } from "@/types/User";
 
 const UserContext = createContext<{
 	user: User | null
@@ -22,7 +18,7 @@ export const UserProvider = ({
 	initialUser,
 }: {
 	children: React.ReactNode
-	initialUser: User
+	initialUser: User | null
 }) => {
 	const [user, setUser] = useState<User | null>(initialUser)
 

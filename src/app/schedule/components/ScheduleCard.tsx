@@ -1,34 +1,34 @@
 "use client"
 
 import { useState } from "react";
-import { SleepProps } from "@/app/sleep/types/Sleep";
-import { DAYS_OF_WEEK } from "@/app/sleep/lib/consts";
-import { getEndTime } from "@/app/sleep/lib/utils";
-import { fetchSleepUpdate } from "@/app/sleep/lib/api";
+import { ScheduleProps } from "@/app/schedule/types/Schedule";
+import { DAYS_OF_WEEK } from "@/app/schedule/lib/consts";
+import { getEndTime } from "@/app/schedule/lib/utils";
+import { fetchScheduleUpdate } from "@/app/schedule/lib/api";
 
-export default function SleepCard({
-	sleep,
-	setIsOpen,
+export default function ScheduleCard({
+	schedule,
 	setError
 }: {
-	sleep: SleepProps,
-	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
+	schedule: ScheduleProps,
 	setError: React.Dispatch<React.SetStateAction<string>>,
 }) {
-	const [sleepProps] = useState<SleepProps>(sleep);
-	const endTime = getEndTime(sleep.startTime, sleep.duration);
-	const [isEnabled, setIsEnabled] = useState<boolean>(sleep.isEnabled);
+	const [scheduleProps] = useState<ScheduleProps>(schedule);
+	const endTime = getEndTime(schedule.startTime, schedule.duration);
+	const [isEnabled, setIsEnabled] = useState<boolean>(schedule.isEnabled);
 
 	const handleToggleActive = async () => {
 		setIsEnabled(!isEnabled);
-		console.log("Toggled");
 
-		const data: SleepProps = {
-			...sleepProps,
+		const data: ScheduleProps = {
+			...scheduleProps,
 			isEnabled: !isEnabled
 		}
-
-		fetchSleepUpdate(data, setIsOpen, setError);
+		
+		const err: string = await fetchScheduleUpdate(data);		
+		if (err) {
+			setError(err);
+		}
 	}
 
 	return (
@@ -36,11 +36,12 @@ export default function SleepCard({
 			<div className="w-[640px] cursor-pointer flex items-center gap-4 bg-stone-800 rounded-xl px-4 py-3 my-2 hover:bg-stone-700 transition">
 				{/* Left section (info) */}
 				<div className="flex flex-col flex-grow text-white">
+					<h1>ID: {schedule.id}</h1>
 					{/* Top row */}
 					<div className="flex gap-12 mb-4">
 						<div>
 							<div className="text-m text-neutral-400 font-light">Start</div>
-							<div className="text-xl font-mono">{sleep.startTime}</div>
+							<div className="text-xl font-mono">{schedule.startTime}</div>
 						</div>
 						<div>
 							<div className="text-m text-neutral-400 font-light">End</div>
@@ -48,7 +49,7 @@ export default function SleepCard({
 						</div>
 						<div>
 							<div className="text-m text-neutral-400 font-light">Duration (mins)</div>
-							<div className="text-xl font-mono">{sleep.duration}</div>
+							<div className="text-xl font-mono">{schedule.duration}</div>
 						</div>
 					</div>
 
@@ -57,7 +58,7 @@ export default function SleepCard({
 						{DAYS_OF_WEEK.map((day) => (
 							<span
 								key={day}
-								className={`px-3 py-1 rounded-lg font-mono ${sleep.days.includes(day)
+								className={`px-3 py-1 rounded-lg font-mono ${schedule.days.includes(day)
 									? "bg-green-500 text-white"
 									: "bg-neutral-600 text-neutral-400"
 									}`}

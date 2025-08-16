@@ -4,6 +4,7 @@ import "./globals.css";
 
 import Navbar from "@/components/Navbar";
 import { UserProvider } from "@/context/UserContext";
+import { User } from "@/types/User";
 import fetchSessionUser from "@/lib/api";
 
 const roboto = Roboto({
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
-	const user = await fetchSessionUser()
+	const user: User | null = await fetchSessionUser()
 
 	return (
 		<html lang="en" className="h-screen">

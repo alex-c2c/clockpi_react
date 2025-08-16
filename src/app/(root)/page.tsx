@@ -1,7 +1,7 @@
 import TimeDiv from "@/app/(root)/components/TimeDiv"
 import EpdDiv from "@/app/(root)/components/EpdDiv";
 import WallpaperDiv from "@/app/(root)/components/WallpaperDiv";
-import SleepDiv from "@/app/(root)/components/SleepDiv";
+import ScheduleDiv from "@/app/(root)/components/ScheduleDiv";
 
 export default function App() {
 	return (
@@ -9,7 +9,7 @@ export default function App() {
 			<TimeDiv />
 			<EpdDiv />
 			<WallpaperDiv />
-			<SleepDiv />
+			<ScheduleDiv />
 		</div>
 	);
 }

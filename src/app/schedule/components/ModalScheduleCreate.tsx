@@ -1,15 +1,17 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { SleepProps } from "@/app/sleep/types/Sleep";
-import { DAYS_OF_WEEK } from "@/app/sleep/lib/consts";
-import { fetchSleepCreate } from "@/app/sleep/lib/api";
-import { getEndTime } from "@/app/sleep/lib/utils";
+import { ScheduleProps } from "@/app/schedule/types/Schedule";
+import { DAYS_OF_WEEK } from "@/app/schedule/lib/consts";
+import { fetchScheduleCreate as fetchScheduleCreate } from "@/app/schedule/lib/api";
+import { checkDataValidity, getEndTime } from "@/app/schedule/lib/utils";
 
-export default function ModalSleepCreate({
-	setIsOpen
+export default function ModalScheduleCreate({
+	setIsOpen,
+	setIsFetchSchedules: setIsFetchData
 }: {
-	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
+	setIsFetchSchedules: React.Dispatch<React.SetStateAction<boolean>>
 }) {
 	const [startTime, setStartTime] = useState<string>("12:00");
 	const [duration, setDuration] = useState<number>(1);
@@ -30,7 +32,15 @@ export default function ModalSleepCreate({
 	}
 
 	const handleClickCreate = async () => {
-		const newSleep: SleepProps = {
+		// validate data before fetching API
+		const dataError: string | null = checkDataValidity(startTime, duration, days);
+		if (dataError != null) {
+			setError(dataError);
+			return;
+		}
+		
+		// convert data to object
+		const newSchedule: ScheduleProps = {
 			id: 0,
 			startTime: startTime,
 			duration: duration,
@@ -38,7 +48,15 @@ export default function ModalSleepCreate({
 			isEnabled: true
 		};
 
-		fetchSleepCreate(newSleep, setIsOpen, setError);
+		// fetch API and await result
+		const err: string = await fetchScheduleCreate(newSchedule);		
+		if (!err) {
+			setIsOpen(false);
+			setIsFetchData(true);
+		}
+		else {
+			setError(err);
+		}
 	};
 
 	useEffect(() => {

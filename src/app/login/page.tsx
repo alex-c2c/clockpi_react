@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import { User } from "@/types/User";
 
 export default function LoginPage() {
 	const searchParams = useSearchParams()
@@ -29,7 +30,8 @@ export default function LoginPage() {
 
 			const data = await res.json();
 			if (res.ok) {
-				setUser(data.user)
+				const user: User = data;
+				setUser(user);
 				router.push(redirectPath);
 			}
 			else {
