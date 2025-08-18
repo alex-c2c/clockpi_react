@@ -52,19 +52,26 @@ export default function UploadDiv() {
 		const formData = new FormData();
 		formData.append("file", selectedFile);
 
+		console.debug("fetchWallpaperUpload");
 		try {
 			const res = await fetch("/api/wallpaper/upload", {
 				method: "POST",
 				body: formData,
 			});
+			
+			console.debug("res");
+			console.debug(res);
 
 			if (res.ok) {
+				resetFile();
 				setUploadStatus("✅ Wallpaper uploaded successfully!");
 			} else {
+				const j = await res.json();
+				console.error(`res error: ${j.message}`);
 				setUploadStatus("❌ Upload failed.");
 			}
 		} catch (err) {
-			console.error(err);
+			console.error(`API call failed: ${err}`);
 			setUploadStatus("❌ Something went wrong.");
 		}
 	};
