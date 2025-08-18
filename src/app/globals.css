@@ -10,12 +10,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  
+
   --animate-fade-in: fade-in 200ms ease-in-out;
-  
+
   @keyframes fade-in {
-	0% { opacity: 0;},
-	100% { opacity: 1;}
+    0% {
+      opacity: 0;
+    }
+    ,
+    100% {
+      opacity: 1;
+    }
   }
 }
 
@@ -26,7 +31,15 @@
   }
 }
 
-html, body {
+html,
+body {
   padding: 0;
   margin: 0;
+}
+
+.slick-slide .slide-h3 {
+  background: blue;
+}
+.slick-center .slide-h3 {
+  background: red;
 }

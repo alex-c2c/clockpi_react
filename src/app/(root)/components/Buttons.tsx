@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation";
+import { fetchQueueNext, fetchQueueShuffle } from "../lib/api";
 
 export function ButtonScheduleEdit() {
 	const router = useRouter();
@@ -30,28 +31,10 @@ export function ButtonWallpaperEdit() {
 	);
 }
 
-export function ButtonWallpaperNext({ setTimestamp }: { setTimestamp: React.Dispatch<React.SetStateAction<number>> }) {
-	const router = useRouter();
-
+export function ButtonWallpaperNext({ setIsFetchQueue }: { setIsFetchQueue: React.Dispatch<React.SetStateAction<boolean>> }) {
 	const handleClick = async () => {
-		try {
-			const res = await fetch("/api/queue/next", {
-				method: "GET",
-				credentials: "include",
-			});
-
-			if (res.ok) {
-				setTimestamp(Date.now());
-				router.push("/");
-			}
-			else {
-				console.error("Wallpaper queue next failed");
-			}
-		}
-		catch (err) {
-			console.error("Error calling /api/queue/next", err);
-		}
-	};
+		fetchQueueNext(setIsFetchQueue);
+	}
 
 	return (
 		<button onClick={handleClick} className="w-1/3 h-[50px] bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-2xl font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700">
@@ -60,27 +43,9 @@ export function ButtonWallpaperNext({ setTimestamp }: { setTimestamp: React.Disp
 	);
 }
 
-export function ButtonWallpaperShuffle({ setTimestamp }: { setTimestamp: React.Dispatch<React.SetStateAction<number>> }) {
-	const router = useRouter();
-
+export function ButtonWallpaperShuffle({ setIsFetchQueue }: { setIsFetchQueue: React.Dispatch<React.SetStateAction<boolean>> }) {
 	const handleClick = async () => {
-		try {
-			const res = await fetch("/api/queue/shuffle", {
-				method: "GET",
-				credentials: "include",
-			});
-
-			if (res.ok) {
-				setTimestamp(Date.now());
-				router.push("/");
-			}
-			else {
-				console.error("Wallpaper queue shuffle failed");
-			}
-		}
-		catch (err) {
-			console.error("Error calling /api/queue/shuffle", err);
-		}
+		fetchQueueShuffle(setIsFetchQueue);
 	};
 
 	return (

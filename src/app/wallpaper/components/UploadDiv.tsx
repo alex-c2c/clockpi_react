@@ -53,7 +53,7 @@ export default function UploadDiv() {
 		formData.append("file", selectedFile);
 
 		try {
-			const res = await fetch("/api/upload", {
+			const res = await fetch("/api/wallpaper/upload", {
 				method: "POST",
 				body: formData,
 			});
@@ -93,7 +93,7 @@ export default function UploadDiv() {
 	};
 
 	return (
-		<div className="w-[640px] bg-stone-800 rounded-2xl p-6 flex flex-col justify-center">
+		<div className="w-[800px] bg-stone-800 rounded-2xl p-6 flex flex-col justify-center">
 			<h2 className="text-xl text-white mb-2 self-start uppercase tracking-widest font-extrabold">
 				Upload Wallpaper
 			</h2>

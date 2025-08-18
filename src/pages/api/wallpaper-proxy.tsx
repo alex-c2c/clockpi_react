@@ -8,10 +8,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		return res.status(400).json({ error: "Missing or invalid wallpaper id" });
 	}
 
-	const flaskImageUrl = `${process.env.FLASK_URL}/wallpaper/file?id=${id}`;
+	const url = `${process.env.FLASK_URL}/wallpaper/file?id=${id}`;
 
 	try {
-		const flaskRes = await fetch(flaskImageUrl, {
+		const flaskRes = await fetch(url, {
 			method: "GET",
 			headers: {
 				"api-key": `${process.env.LOCAL_API_KEY}`,
