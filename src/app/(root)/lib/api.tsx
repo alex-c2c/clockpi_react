@@ -103,3 +103,47 @@ export async function fetchQueue(
 		setError(`${err}`);
 	}
 }
+
+export async function fetchEpdRefresh() {
+	console.debug("fetchEpdRefresh");
+	try {
+		const res = await fetch("/api/epd/refresh", {
+			method: "GET",
+			credentials: "include",
+			cache: "no-store",
+		});
+
+		console.debug("res");
+		console.debug(res)
+
+		if (!res.ok) {
+			const j = await res.json();
+			console.error(`res error: ${j.message}`);
+		}
+	}
+	catch (err) {
+		console.error(`API call failed: ${err}`)
+	}
+}
+
+export async function fetchEpdClear() {
+	console.debug("fetchEpdClear")
+	try {
+		const res = await fetch("/api/epd/clear", {
+			method: "GET",
+			credentials: "include",
+			cache: "no-store",
+		});
+
+		console.debug("res");
+		console.debug(res)
+
+		if (!res.ok) {
+			const j = await res.json();
+			console.error(`res error: ${j.message}`);
+		}
+	}
+	catch (err) {
+		console.error(`API call failed: ${err}`)
+	}
+};
