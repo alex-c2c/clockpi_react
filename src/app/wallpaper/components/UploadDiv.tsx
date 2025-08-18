@@ -10,9 +10,15 @@ export default function UploadDiv() {
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	const [fileDispName, setFileDispName] = useState("No file chosen");
 	const [previewURL, setPreviewURL] = useState<string | null>(null);
-	const [uploadStatus, setUploadStatus] = useState("");
+	const [uploadStatus, setUploadStatus] = useState<string | null>(null);
 
 	const MAX_FILE_SIZE_MB = 16;
+
+	const resetFile = () => {
+		setSelectedFile(null);
+		setFileDispName("No file chosen");
+		setPreviewURL(null);
+	};
 
 	const handleFile = (file: File) => {
 		const validTypes = ["image/png", "image/jpeg"];
@@ -34,12 +40,6 @@ export default function UploadDiv() {
 		setUploadStatus("");
 	};
 
-	const resetFile = () => {
-		setSelectedFile(null);
-		setFileDispName("No file chosen");
-		setPreviewURL(null);
-	};
-
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) handleFile(file);
@@ -58,7 +58,7 @@ export default function UploadDiv() {
 				method: "POST",
 				body: formData,
 			});
-			
+
 			console.debug("res");
 			console.debug(res);
 
@@ -76,13 +76,6 @@ export default function UploadDiv() {
 		}
 	};
 
-	// Clean up preview URL
-	useEffect(() => {
-		return () => {
-			if (previewURL) URL.revokeObjectURL(previewURL);
-		};
-	}, [previewURL]);
-
 	const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		const file = e.dataTransfer.files?.[0];
@@ -99,6 +92,24 @@ export default function UploadDiv() {
 		inputRef.current?.click();
 	};
 
+	// Clean up preview URL
+	useEffect(() => {
+		return () => {
+			if (previewURL) URL.revokeObjectURL(previewURL);
+		};
+	}, [previewURL]);
+
+	// auto dismiss status bar after 3000ms
+	useEffect(() => {
+		if (uploadStatus) {
+			const timer = setTimeout(() => {
+				setUploadStatus(null);
+			}, 10000);
+
+			return () => clearTimeout(timer);
+		}
+	}, [uploadStatus])
+
 	return (
 		<div className="w-[800px] bg-stone-800 rounded-2xl p-6 flex flex-col justify-center">
 			<h2 className="text-xl text-white mb-2 self-start uppercase tracking-widest font-extrabold">
@@ -108,7 +119,16 @@ export default function UploadDiv() {
 
 			<form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
 				{uploadStatus && (
-					<p className="text-white bg-stone-700 px-4 py-2 rounded">{uploadStatus}</p>
+					<div className="w-full flex items-center justify-between text-white bg-stone-600 px-4 py-2 rounded-lg shadow-md">
+						<p className="mr-4">{uploadStatus}</p>
+						<button
+							onClick={() => setUploadStatus(null)}
+							className="text-white hover:text-red-400 transition duration-200 text-lg leading-none"
+							aria-label="Close"
+						>
+							&times;
+						</button>
+					</div>
 				)}
 
 				{/* Drag and drop zone */}
@@ -116,7 +136,7 @@ export default function UploadDiv() {
 					onDrop={handleDrop}
 					onDragOver={handleDragOver}
 					onClick={handleFileClick}
-					className="w-full border-2 border-dashed border-white rounded-lg p-6 text-white text-center cursor-pointer hover:bg-stone-700 transition"
+					className="w-full border-2 border-dashed border-white rounded-xl p-6 text-white text-center cursor-pointer hover:bg-stone-700 transition"
 				>
 					<p className="text-white">Drag & drop image here, or click to select</p>
 					<p className="text-sm mt-2 text-stone-300">{fileDispName}</p>
