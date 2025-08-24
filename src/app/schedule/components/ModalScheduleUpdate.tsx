@@ -23,6 +23,7 @@ export default function ModalScheduleUpdate({
 	const [error, setError] = useState("");
 
 	const toggleDay = (day: string) => {
+		console.debug(day);
 		setDays(prev =>
 			prev.includes(day)
 				? prev.filter(d => d !== day)
@@ -40,7 +41,7 @@ export default function ModalScheduleUpdate({
 			setError("Invalid or missing ID");
 			return;
 		}
-		
+
 		// validate data before fetching API
 		const dataError: string | null = checkDataValidity(startTime, duration, days);
 		if (dataError != null) {
@@ -56,7 +57,7 @@ export default function ModalScheduleUpdate({
 			isEnabled: true
 		};
 
-		const err: string = await fetchScheduleUpdate(currentSchedule);		
+		const err: string = await fetchScheduleUpdate(currentSchedule);
 		if (!err) {
 			setIsOpen(false);
 			setIsFetchSchedules(true);
@@ -67,12 +68,12 @@ export default function ModalScheduleUpdate({
 	};
 
 	const handleClickDelete = async () => {
-		const err: string = await fetchScheduleDelete(id);		
+		const err: string = await fetchScheduleDelete(id);
 		if (!err) {
 			setIsOpen(false);
 			setIsFetchSchedules(true);
 		}
-		else{
+		else {
 			setError(err);
 		}
 	}
@@ -81,9 +82,23 @@ export default function ModalScheduleUpdate({
 		setEndTime(getEndTime(startTime, duration));
 	}, [startTime, duration])
 
+	useEffect(() => {
+		const handleEscKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				setIsOpen(false);
+			}
+		};
+
+		window.addEventListener('keydown', handleEscKeyDown);
+
+		return () => {
+			window.removeEventListener('keydown', handleEscKeyDown);
+		};
+	}, [setIsOpen]);
+
 	return (
 		<div className="relative">
-			<div className="fixed inset-0 z-50 flex items-center justify-center">
+			<div className="fixed inset-0 z-50 flex items-center justify-center px-4">
 				{/* Overlay Background */}
 				<div
 					onClick={handleClickClose}
@@ -91,10 +106,10 @@ export default function ModalScheduleUpdate({
 				</div>
 
 				{/* Model Content */}
-				<div className="relative bg-stone-700 p-6 rounded-2xl shadow-lg text-center items-center justify-center">
+				<div className="relative w-full max-w-sm bg-stone-700 p-6 rounded-2xl shadow-lg text-center items-center justify-center">
 					{/* Header */}
 					<h2 className="text-2xl text-white uppercase tracking-wider font-semibold mb-4">
-						Update Sleep Schedule
+						Update Schedule
 					</h2>
 
 					{/* Error messages */}

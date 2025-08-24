@@ -38,7 +38,7 @@ export default function ModalScheduleCreate({
 			setError(dataError);
 			return;
 		}
-		
+
 		// convert data to object
 		const newSchedule: ScheduleProps = {
 			id: 0,
@@ -49,7 +49,7 @@ export default function ModalScheduleCreate({
 		};
 
 		// fetch API and await result
-		const err: string = await fetchScheduleCreate(newSchedule);		
+		const err: string = await fetchScheduleCreate(newSchedule);
 		if (!err) {
 			setIsOpen(false);
 			setIsFetchData(true);
@@ -62,6 +62,20 @@ export default function ModalScheduleCreate({
 	useEffect(() => {
 		setEndTime(getEndTime(startTime, duration));
 	}, [startTime, duration])
+
+	useEffect(() => {
+		const handleEscKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				setIsOpen(false);
+			}
+		};
+
+		window.addEventListener('keydown', handleEscKeyDown);
+
+		return () => {
+			window.removeEventListener('keydown', handleEscKeyDown);
+		};
+	}, [setIsOpen]);
 
 	return (
 		<div className="relative">
@@ -76,7 +90,7 @@ export default function ModalScheduleCreate({
 				<div className="relative bg-stone-700 p-6 rounded-2xl shadow-lg text-center items-center justify-center">
 					{/* Header */}
 					<h2 className="text-2xl text-white uppercase tracking-wider font-semibold mb-4">
-						New Sleep Schedule
+						New Schedule
 					</h2>
 
 					{/* Error messages */}

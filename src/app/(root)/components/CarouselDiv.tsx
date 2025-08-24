@@ -11,7 +11,7 @@ function NextArrow(props: any) {
   const { className, onClick } = props;
   return (
     <div
-      className={`${className} mr-10 scale-300 z-10`}
+      className={`${className} mr-10 mt-2 sm:mr-14 scale-200 sm:scale-300 z-10`}
       onClick={onClick}
     />
   );
@@ -22,7 +22,7 @@ function PrevArrow(props: any) {
   const { className, onClick } = props;
   return (
     <div
-      className={`${className} ml-10 scale-300 z-10`}
+      className={`${className} ml-10 mt-2 sm:ml-14 scale-200 sm:scale-300 z-100`}
       onClick={onClick}
     />
   );
@@ -37,17 +37,12 @@ export default function CarouselDiv() {
 		className: "center",
 		centerMode: true,
 		infinite: true,
-		centerPadding: "50px",
+		centerPadding: "80px",
 		slidesToShow: 1,
 		speed: 500,
-		dots: true,
+		dots: false,
 		nextArrow: <NextArrow />,
 		prevArrow: <PrevArrow />,
-		customPaging: (i: number) => (
-			<div className="text-white hover:text-neutral-400">
-				{i + 1}
-			</div>
-		)
 	};
 
 	useEffect(() => {
@@ -62,16 +57,16 @@ export default function CarouselDiv() {
 	}, [queue]);
 
 	return (
-		<div className="w-[800px] bg-stone-800 rounded-2xl p-6 flex flex-col justify-center">
-			<h2 className="text-xl text-white mb-2 self-start uppercase tracking-widest font-extrabold">
+		<div className="w-full max-w-4xl p-4 sm:p-6 mx-auto bg-stone-800 rounded-2xl flex flex-col justify-center">
+			<h2 className="text-xl sm:text-xl text-white mb-2 self-start uppercase tracking-widest font-extrabold">
 				Wallpapers
 			</h2>
-			<div className="w-full h-px bg-white opacity-30 mb-6" />
-			<div className="w-full flex items-center justify-center mb-6">
+			<div className="w-full h-px bg-white opacity-30 mb-4 sm:mb-6" />
+			<div className="w-full flex items-center justify-center mb-2 sm:mb-4">
 				{error ? (
 					<h2 className="text-red-500 text-lg">
 						{error}
-					</h2>					
+					</h2>
 				) : (
 				<Slider {...settings} className="w-full">
 					{queue?.map((id, index) => (
@@ -83,7 +78,7 @@ export default function CarouselDiv() {
 					
 				)}
 			</div>
-			<div className="flex gap-8 pt-4">
+			<div className="flex gap-4">
 				<ButtonWallpaperShuffle setIsFetchQueue={setIsFetchQueue} />
 				<ButtonWallpaperNext setIsFetchQueue={setIsFetchQueue} />
 				<ButtonWallpaperEdit />

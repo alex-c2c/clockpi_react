@@ -20,8 +20,8 @@ export default function TimeDiv() {
 		.split(":");
 
 	return (
-		<div className="w-[800px] bg-stone-800 rounded-2xl p-6 flex flex-col justify-center">
-			<h2 className="text-xl text-white mb-2 self-start uppercase tracking-widest font-extrabold">
+		<div className="w-full max-w-4xl p-4 sm:p-6 mx-auto bg-stone-800 rounded-2xl flex flex-col justify-center">
+			<h2 className="text-xl sm:text-xl text-white mb-2 self-start uppercase tracking-widest font-extrabold">
 				Current Time
 			</h2>
 			<div className="w-full h-px bg-white opacity-30 mb-6" />

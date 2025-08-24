@@ -17,8 +17,8 @@ export default function CarouselImage({ wallpaperId, index }: { wallpaperId: num
 				<div className="relative inline-block">
 					{/* Number label */}
 					<span className={`absolute ${index === 0 ? 
-						"top-1 left-1 bg-green-400 text-white text-2xl px-2 py-0 rounded-tl-2xl rounded-br-md z-100" : 
-						"top-[18px] left-[24px] bg-neutral-800 text-white text-xl px-2 py-0 rounded-full z-100"}`}>
+						"top-1 left-1 bg-green-400 text-white text-l sm:text-xl px-2 py-0 rounded-tl-2xl rounded-br-md z-100" : 
+						"top-4 sm:top-7 left-6 sm:left-11 bg-neutral-800 text-white text-l sm:text-xl px-2 py-0 rounded-full z-100"}`}>
 						{index + 1}
 					</span>
 					{/* Image */}
@@ -27,7 +27,7 @@ export default function CarouselImage({ wallpaperId, index }: { wallpaperId: num
 						alt={`Wallpaper ID: ${wallpaperId}`}
 						width="auto"
 						height="auto"
-						className={`rounded-3xl ${index === 0 ? "border-6 border-green-400" : "opacity-60 scale-95"}`}
+						className={`rounded-3xl ${index === 0 ? "border-4 sm:border-6 border-green-400" : "opacity-60 scale-85 sm:scale-90"}`}
 						onError={handleFetchImageError}
 						inert
 					/>

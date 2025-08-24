@@ -5,11 +5,25 @@
   --foreground: #171717;
 }
 
+@source inline("text-white");
+@source inline("text-black");
+@source inline("text-red-500");
+@source inline("text-blue-500");
+@source inline("text-green-500");
+@source inline("text-yellow-500");
+@source inline("bg-white");
+@source inline("bg-black");
+@source inline("bg-red-500");
+@source inline("bg-blue-500");
+@source inline("bg-green-500");
+@source inline("bg-yellow-500");
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-time: var(--font-roboto-mono);
 
   --animate-fade-in: fade-in 200ms ease-in-out;
 
@@ -21,7 +35,7 @@
     100% {
       opacity: 1;
     }
-  }
+  }  
 }
 
 @media (prefers-color-scheme: dark) {

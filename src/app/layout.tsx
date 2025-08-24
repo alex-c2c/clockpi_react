@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -14,6 +14,11 @@ const roboto = Roboto({
 	weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"], // adjust weights as needed
 });
 
+const robotoMono = Roboto_Mono({
+  subsets: ['latin'],
+  variable: '--font-roboto-mono',
+});
+
 export const metadata: Metadata = {
 	title: "Clock Pi",
 	description: "Watch your life counting down with waifu wallpaper!",
@@ -23,12 +28,13 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 	const user: User | null = await fetchSessionUser()
 
 	return (
+		
 		<html lang="en" className="h-screen">
-			<body className={`${roboto.className} antialiased h-screen m-0 bg-stone-900 text-white`}>
+			<body className={`${roboto.className} ${robotoMono.variable} antialiased h-screen bg-stone-900 text-white`}>
 				<div className="flex flex-col h-screen">
 					<UserProvider initialUser={user}>
 						<Navbar />
-						<main className="flex-1 overflow-y-auto">
+						<main className="flex-1 overflow-y-auto px-4">
 							{children}
 						</main>
 					</UserProvider>

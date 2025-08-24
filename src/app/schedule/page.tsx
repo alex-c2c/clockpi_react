@@ -78,8 +78,8 @@ export default function SchedulePage() {
 
 	return (
 		<div className="flex flex-col items-center pt-4 bg-stone-1000">
-			<div className="w-[640px] bg-stone-800 rounded-xl px-6 mb-2 flex flex-col">
-				<div className="flex justify-between items-center">
+			<div className="w-full max-w-4xl bg-stone-800 rounded-xl mb-2 flex flex-col">
+				<div className="flex justify-between items-center px-4">
 
 					{/* Sub-Header */}
 					<h2 className="text-xl text-white uppercase tracking-widest font-extrabold">
@@ -88,7 +88,7 @@ export default function SchedulePage() {
 
 					{/* "+" button */}
 					<div className="relative">
-						<button onClick={() => setIsCreateScheduleModalOpen(true)} className="text-orange-400 text-3xl font-extrabold py-2 px-4 rounded hover:text-orange-500">
+						<button onClick={() => setIsCreateScheduleModalOpen(true)} className="text-orange-400 text-3xl font-extrabold py-2 rounded hover:text-orange-500">
 							+
 						</button>
 
@@ -106,7 +106,7 @@ export default function SchedulePage() {
 
 			{/* Sleep Card List */}
 			{scheduleList?.map((schedule, index) => (
-				<div onClick={() => handleClickCard(schedule.id)} key={index}>
+				<div onClick={() => handleClickCard(schedule.id)} key={index} className="w-full max-w-4xl ">
 					<ScheduleCard
 						key={schedule.id}
 						schedule={schedule}
