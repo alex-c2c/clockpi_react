@@ -284,10 +284,10 @@ export default function ModalWallpaperUpdate({
 							onTouchStart={startDrag}
 						>
 							{/* Inner text scales independently */}
-							<div className="w-full h-full flex items-center justify-center relative z-0">
+							<div className="w-full h-full flex items-center justify-center relative">
 								{/* SHADOW SPAN */}
 								<span
-									className={`font-time font-bold text-3xl absolute pr-0.5 pt-0.5 sm:pr-0 sm:pb-0.5
+									className={`font-time font-bold text-3xl relative
 										${(textShadow == "white" || textShadow == "black") ?
 											`text-${textShadow}` :
 											`text-${textShadow}-500`}`}
@@ -302,7 +302,7 @@ export default function ModalWallpaperUpdate({
 
 								{/* FRONT SPAN */}
 								<span
-									className={`font-time font-bold text-3xl relative pt-0 pl-0.25 sm:pl-0.5 sm:pb-0.5
+									className={`font-time font-bold text-3xl absolute pl-0.5 pb-0.25 sm:pl-0.5 sm:pb-0.25
 										${(textColor == "white" || textColor == "black") ?
 											`text-${textColor}` :
 											`text-${textColor}-500`}`}
