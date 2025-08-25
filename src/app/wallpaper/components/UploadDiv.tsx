@@ -1,7 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
 "use client"
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { shortenFileName } from "@/lib/utils";
 import * as Tooltip from "@radix-ui/react-tooltip";
 
@@ -12,7 +11,91 @@ export default function UploadDiv() {
 	const [previewURL, setPreviewURL] = useState<string | null>(null);
 	const [uploadStatus, setUploadStatus] = useState<string | null>(null);
 
+	const canvasRef = useRef<HTMLCanvasElement | null>(null);
+	const imgRef = useRef<HTMLImageElement | null>(null);
+
+	const [isDragging, setIsDragging] = useState(false);
+	const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+	const [offset, setOffset] = useState({ x: 0, y: 0 });
+	const [scale, setScale] = useState(1);
+
 	const MAX_FILE_SIZE_MB = 16;
+
+	const drawImage = useCallback(() => {
+		if (!canvasRef.current || !imgRef.current) return;
+
+		const ctx = canvasRef.current.getContext("2d");
+		if (!ctx) return;
+
+		const canvas = canvasRef.current;
+		const img = imgRef.current;
+
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		// === Step 1: Draw blurred background ===
+		ctx.save();
+		ctx.filter = "blur(4px) brightness(0.7)";
+
+		// Scale image to fill canvas (cover strategy)
+		const scaleX = canvas.width / img.width;
+		const scaleY = canvas.height / img.height;
+		const fillScale = Math.max(scaleX, scaleY);
+
+		const bgWidth = img.width * fillScale;
+		const bgHeight = img.height * fillScale;
+		const bgX = (canvas.width - bgWidth) / 2;
+		const bgY = (canvas.height - bgHeight) / 2;
+
+		ctx.drawImage(img, bgX, bgY, bgWidth, bgHeight);
+		ctx.restore();
+
+		// === Step 2: Draw main image with user-controlled offset/scale ===
+		ctx.save();
+		ctx.beginPath();
+		ctx.rect(0, 0, canvas.width, canvas.height);
+		ctx.clip();
+
+		ctx.drawImage(
+			img,
+			offset.x,
+			offset.y,
+			img.width * scale,
+			img.height * scale
+		);
+
+		ctx.restore();
+	}, [offset.x, offset.y, scale]);
+
+	const startDragging = (e: React.MouseEvent<HTMLCanvasElement>) => {
+		setIsDragging(true);
+		setDragStart({ x: e.clientX, y: e.clientY });
+	};
+
+	const onDrag = (e: React.MouseEvent<HTMLCanvasElement>) => {
+		if (!isDragging) return;
+
+		const dx = e.clientX - dragStart.x;
+		const dy = e.clientY - dragStart.y;
+
+		setDragStart({ x: e.clientX, y: e.clientY });
+		setOffset((prev) => {
+			const newOffset = { x: prev.x + dx, y: prev.y + dy };
+			return newOffset;
+		});
+	};
+
+	const stopDragging = () => {
+		setIsDragging(false);
+	};
+
+	const handleZoom = (e: React.WheelEvent<HTMLCanvasElement>) => {
+		//e.preventDefault();
+		const delta = e.deltaY < 0 ? 0.05 : -0.05;
+		setScale((prev) => {
+			const newScale = Math.min(Math.max(prev + delta, 0.1), 5); // clamp
+			return newScale;
+		});
+	};
 
 	const resetFile = () => {
 		setSelectedFile(null);
@@ -51,6 +134,9 @@ export default function UploadDiv() {
 
 		const formData = new FormData();
 		formData.append("file", selectedFile);
+		formData.append("scale", JSON.stringify(scale));
+		formData.append("offsetX", JSON.stringify(offset.x))
+		formData.append("offsetY", JSON.stringify(offset.y))
 
 		console.debug("fetchWallpaperUpload");
 		try {
@@ -92,6 +178,159 @@ export default function UploadDiv() {
 		inputRef.current?.click();
 	};
 
+	const handleAnimateToCenterHorizontal = () => {
+		if (!imgRef.current) return;
+
+		const img = imgRef.current;
+
+		const targetOffsetX = (800 - img.width * scale) / 2;
+		const duration = 300; // ms
+		const start = performance.now();
+
+		const initialOffset = { ...offset };
+
+		const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+		const easeInOutQuad = (t: number) =>
+			t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+		const animate = (time: number) => {
+			const elapsed = time - start;
+			const tRaw = Math.min(elapsed / duration, 1);
+			const t = easeInOutQuad(tRaw);
+
+			const newOffsetX = lerp(initialOffset.x, targetOffsetX, t);
+
+			setOffset({ ...offset, x: newOffsetX });
+
+			if (tRaw < 1) {
+				requestAnimationFrame(animate);
+			}
+		};
+
+		requestAnimationFrame(animate);
+	};
+	
+	const handleAnimateToCenterVertical = () => {
+		if (!imgRef.current) return;
+
+		const img = imgRef.current;
+
+		const targetOffsetY = (480 - img.height * scale) / 2;
+		const duration = 300; // ms
+		const start = performance.now();
+
+		const initialOffset = { ...offset };
+
+		const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+		const easeInOutQuad = (t: number) =>
+			t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+		const animate = (time: number) => {
+			const elapsed = time - start;
+			const tRaw = Math.min(elapsed / duration, 1);
+			const t = easeInOutQuad(tRaw);
+
+			const newOffsetY = lerp(initialOffset.y, targetOffsetY, t);
+			setOffset({ ...offset, y: newOffsetY });
+
+			if (tRaw < 1) {
+				requestAnimationFrame(animate);
+			}
+		};
+
+		requestAnimationFrame(animate);
+	};
+
+	const handleAnimateToFit = () => {
+		if (!imgRef.current) return;
+
+		const img = imgRef.current;
+
+		const targetScale = Math.min(800 / img.width, 480 / img.height);
+		const targetOffset = {
+			x: (800 - img.width * targetScale) / 2,
+			y: (480 - img.height * targetScale) / 2,
+		};
+
+		const duration = 300; // ms
+		const start = performance.now();
+
+		const initialOffset = { ...offset };
+		const initialScale = scale;
+
+		const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+		const easeInOutQuad = (t: number) =>
+			t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+		const animate = (time: number) => {
+			const elapsed = time - start;
+			const tRaw = Math.min(elapsed / duration, 1);
+			const t = easeInOutQuad(tRaw);
+
+			const newOffset = {
+				x: lerp(initialOffset.x, targetOffset.x, t),
+				y: lerp(initialOffset.y, targetOffset.y, t),
+			};
+
+			const newScale = lerp(initialScale, targetScale, t);
+
+			setOffset(newOffset);
+			setScale(newScale);
+
+			if (tRaw < 1) {
+				requestAnimationFrame(animate);
+			}
+		};
+
+		requestAnimationFrame(animate);
+	};
+	
+	const handleAnimateToFill = () => {
+		if (!imgRef.current) return;
+
+		const img = imgRef.current;
+
+		const targetScale = Math.max(800 / img.width, 480 / img.height);
+		const targetOffset = {
+			x: (800 - img.width * targetScale) / 2,
+			y: (480 - img.height * targetScale) / 2,
+		};
+
+		const duration = 300; // ms
+		const start = performance.now();
+
+		const initialOffset = { ...offset };
+		const initialScale = scale;
+
+		const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+		const easeInOutQuad = (t: number) =>
+			t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+		const animate = (time: number) => {
+			const elapsed = time - start;
+			const tRaw = Math.min(elapsed / duration, 1);
+			const t = easeInOutQuad(tRaw);
+
+			const newOffset = {
+				x: lerp(initialOffset.x, targetOffset.x, t),
+				y: lerp(initialOffset.y, targetOffset.y, t),
+			};
+
+			const newScale = lerp(initialScale, targetScale, t);
+
+			setOffset(newOffset);
+			setScale(newScale);
+
+			if (tRaw < 1) {
+				requestAnimationFrame(animate);
+			}
+		};
+
+		requestAnimationFrame(animate);
+	};
+	
+	
+
 	// Clean up preview URL
 	useEffect(() => {
 		return () => {
@@ -109,6 +348,34 @@ export default function UploadDiv() {
 			return () => clearTimeout(timer);
 		}
 	}, [uploadStatus])
+
+	useEffect(() => {
+		if (!previewURL) return;
+
+		const img = new Image();
+		img.src = previewURL;
+
+		img.onload = () => {
+			imgRef.current = img;
+
+			// Fit image within canvas initially
+			const scaleFactor = Math.min(800 / img.width, 480 / img.height);
+			setScale(scaleFactor);
+
+			// Center image
+			const centerX = (800 - img.width * scaleFactor) / 2;
+			const centerY = (480 - img.height * scaleFactor) / 2;
+			setOffset({ x: centerX, y: centerY });
+		};
+
+		return () => {
+			imgRef.current = null;
+		};
+	}, [previewURL]);
+
+	useEffect(() => {
+		drawImage();
+	}, [offset, scale, previewURL, drawImage]);
 
 	return (
 		<div className="w-full max-w-4xl p-4 sm:p-6 mx-auto bg-stone-800 rounded-2xl flex flex-col justify-center">
@@ -152,15 +419,14 @@ export default function UploadDiv() {
 
 				{/* Image Preview */}
 				{previewURL && (
-					<div className="relative w-full">
-						{/* Fancy Close Button (top-right) */}
+					<div className="relative w-full flex justify-center">
 						<Tooltip.Provider>
 							<Tooltip.Root>
 								<Tooltip.Trigger asChild>
 									<button
 										type="button"
 										onClick={resetFile}
-										className="absolute top-2 right-2 z-10 bg-black bg-opacity-60 hover:bg-opacity-80 rounded-full p-1"
+										className="absolute top-2 right-8 z-10 bg-black bg-opacity-60 hover:bg-opacity-80 rounded-full p-1"
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
@@ -174,7 +440,6 @@ export default function UploadDiv() {
 										</svg>
 									</button>
 								</Tooltip.Trigger>
-
 								<Tooltip.Portal>
 									<Tooltip.Content
 										side="top"
@@ -189,22 +454,63 @@ export default function UploadDiv() {
 							</Tooltip.Root>
 						</Tooltip.Provider>
 
-
-						<img
-							src={previewURL}
-							alt="Image preview"
-							className="w-full h-auto object-contain rounded-lg"
+						<canvas
+							ref={canvasRef}
+							width={800}
+							height={480}
+							className="border rounded-lg bg-black"
+							style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+							onMouseDown={startDragging}
+							onMouseMove={onDrag}
+							onMouseUp={stopDragging}
+							onMouseLeave={stopDragging}
+							onWheel={handleZoom}
 						/>
 					</div>
 				)}
 
-				{/* Submit Button */}
-				<button
-					type="submit"
-					className="w-full h-[50px] bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-2xl font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
-				>
-					Upload
-				</button>
+				{/* Center Image Button */}
+				{previewURL && (
+					<div className="">
+						<div className="flex justify-center gap-2">
+							<button
+								type="button"
+								onClick={handleAnimateToCenterVertical}
+								className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+							>
+								Center Vertically
+							</button>
+							<button
+								type="button"
+								onClick={handleAnimateToCenterHorizontal}
+								className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+							>
+								Center Horizontally
+							</button>
+							<button
+								type="button"
+								onClick={handleAnimateToFit}
+								className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+							>
+								Stretch To Fit
+							</button>
+							<button
+								type="button"
+								onClick={handleAnimateToFill}
+								className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+							>
+								Stretch To Fill
+							</button>
+						</div>
+
+						<button
+							type="submit"
+							className="w-full px-2 py-2 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-2xl font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+						>
+							Upload
+						</button>
+					</div>
+				)}
 			</form>
 		</div>
 	);

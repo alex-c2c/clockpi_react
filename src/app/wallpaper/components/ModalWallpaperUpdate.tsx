@@ -339,13 +339,13 @@ export default function ModalWallpaperUpdate({
 					<div className="flex justify-center gap-2 mb-4">
 						<button
 							onClick={handleCenterTextVertically}
-							className="w-full px-4 py-2 rounded-lg bg-stone-600 text-white hover:bg-stone-700 hover:text-neutral-300"
+							className="w-full px-2 py-2 rounded-lg bg-stone-600 text-white hover:bg-stone-700 hover:text-neutral-300"
 						>
 							Center Vertically
 						</button>
 						<button
 							onClick={handleCenterTextHorizontally}
-							className="w-full px-4 py-2 rounded-lg bg-stone-600 text-white hover:bg-stone-700 hover:text-neutral-300"
+							className="w-full px-2 py-2 rounded-lg bg-stone-600 text-white hover:bg-stone-700 hover:text-neutral-300"
 						>
 							Center Horizontally
 						</button>
@@ -360,7 +360,7 @@ export default function ModalWallpaperUpdate({
 								className="w-full flex items-center text-center justify-center gap-2 px-3 py-2 rounded-lg bg-stone-600 text-white hover:bg-stone-700"
 							>
 								<span>Color:</span>
-								<span className={`w-4 h-4 rounded-full capitalize
+								<span className={`w-3 h-3 rounded-full capitalize
 										${(textColor === "white" || textColor === "black") ?
 										`bg-${textColor}` :
 										`bg-${textColor}-500`}`} />
@@ -378,7 +378,7 @@ export default function ModalWallpaperUpdate({
 											}}
 											className="w-full flex justify-center items-center px-2 py-1 hover:bg-stone-700  gap-2 cursor-pointer text-white"
 										>
-											<span className={`w-4 h-4 rounded-full ${(color === "white" || color === "black")
+											<span className={`w-3 h-3 rounded-full ${(color === "white" || color === "black")
 												? `bg-${color}`
 												: `bg-${color}-500`
 												}`} />
@@ -397,7 +397,7 @@ export default function ModalWallpaperUpdate({
 									className="w-full flex items-center text-center justify-center gap-2 px-3 py-2 rounded-lg bg-stone-600 text-white hover:bg-stone-700"
 								>
 									<span>Shadow: </span>
-									<span className={`w-4 h-4 rounded-full capitalize
+									<span className={`w-3 h-3 rounded-full capitalize
 										${(textShadow === "white" || textShadow === "black") ?
 											`bg-${textShadow}` :
 											`bg-${textShadow}-500`}`} />
@@ -416,7 +416,7 @@ export default function ModalWallpaperUpdate({
 											}}
 											className="w-full flex justify-center items-center px-2 py-1 hover:bg-stone-700  gap-2 cursor-pointer text-white"
 										>
-											<span className={`w-4 h-4 rounded-full ${(color === "white" || color === "black")
+											<span className={`w-3 h-3 rounded-full ${(color === "white" || color === "black")
 												? `bg-${color}`
 												: `bg-${color}-500`
 												}`} />
@@ -432,7 +432,7 @@ export default function ModalWallpaperUpdate({
 					{/* Update Button */}
 					<button
 						onClick={handleClickUpdate}
-						className="w-full px-6 py-2 mb-4 rounded-lg bg-green-500 text-white hover:bg-green-600"
+						className="w-full px-4 py-2 mb-4 rounded-lg bg-green-500 text-white hover:bg-green-600"
 					>
 						Update
 					</button>
@@ -440,7 +440,7 @@ export default function ModalWallpaperUpdate({
 					{/* Delete Button */}
 					<button
 						onClick={handleClickDelete}
-						className="w-full px-6 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+						className="w-full px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
 					>
 						Delete
 					</button>
