@@ -7,7 +7,7 @@ import "slick-carousel/slick/slick-theme.css";
 import Navbar from "@/components/Navbar";
 import { UserProvider } from "@/context/UserContext";
 import { User } from "@/types/User";
-import fetchSessionUser from "@/lib/api";
+import { headers } from "next/headers";
 
 const roboto = Roboto({
 	subsets: ["latin"],
@@ -25,10 +25,10 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
-	const user: User | null = await fetchSessionUser()
-
-	return (
-		
+	const userHeader: string | null = (await headers()).get("x-user");
+	const user: User | null = userHeader ? JSON.parse(userHeader) : null;
+	
+	return (		
 		<html lang="en" className="h-screen">
 			<body className={`${roboto.className} ${robotoMono.variable} antialiased h-screen bg-stone-900 text-white`}>
 				<div className="flex flex-col h-screen">

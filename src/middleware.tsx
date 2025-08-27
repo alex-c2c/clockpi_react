@@ -11,8 +11,10 @@ export async function middleware(request: NextRequest) {
 		loginUrl.searchParams.set("redirect", request.nextUrl.pathname)
 		return NextResponse.redirect(loginUrl)
 	}
-
-	return NextResponse.next()
+	
+	const response = NextResponse.next();
+	response.headers.set("x-user", JSON.stringify(user));
+	return response;
 }
 
 export const config = {

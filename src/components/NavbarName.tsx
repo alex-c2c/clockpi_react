@@ -56,7 +56,7 @@ export default function NavbarName() {
 		return (
 			<div ref={dropdownRef} className="relative">
 				<button onClick={() => setIsOpen((prev) => !prev)} className="flex items-center gap-2 text-sm font-medium hover:text-gray-300">
-					{user?.display_name}
+					Hello, {user?.dispName}
 					<span className={`transition-transform ${isOpen ? "" : "rotate-90"}`}>▼</span>
 				</button>
 
