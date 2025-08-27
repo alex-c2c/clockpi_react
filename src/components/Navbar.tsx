@@ -1,5 +1,5 @@
 import Link from "next/link";
-import NavbarName from "./NavbarName";
+import NavbarName from "@/components/NavbarName";
 
 export default function Navbar() {
 	return (

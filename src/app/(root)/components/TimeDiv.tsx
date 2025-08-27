@@ -9,7 +9,7 @@ export default function TimeDiv() {
 	useEffect(() => {
 		const interval = setInterval(() => {
 			setTime(new Date());
-			setShowColon(prev => !prev);
+			setShowColon((prev) => !prev);
 		}, 1000);
 
 		return () => clearInterval(interval);
@@ -29,12 +29,14 @@ export default function TimeDiv() {
 			{/* Time Label with animation */}
 			<div className="text-5xl text-center">
 				{hour}
-				<span className="inline-block w-[0.5ch] transition-opacity duration-200" style={{ opacity: showColon ? 1 : 0 }}>
+				<span
+					className="inline-block w-[0.5ch] transition-opacity duration-200"
+					style={{ opacity: showColon ? 1 : 0 }}
+				>
 					:
 				</span>
 				{minute}
 			</div>
 		</div>
-
 	);
 }

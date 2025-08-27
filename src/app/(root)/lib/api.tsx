@@ -1,149 +1,76 @@
-'use client'
+"use client";
 
-export async function fetchQueueNext(
-	setIsFetchQueue: React.Dispatch<React.SetStateAction<boolean>>,
-	setError: React.Dispatch<React.SetStateAction<string>> | null = null
-) {
-	console.debug("fetchQueueNext");
+import { Result, safeAsync } from "@/lib/result";
 
-	try {
+export function fetchQueueNext(): Promise<Result<void>> {
+	return safeAsync(async () => {
 		const res = await fetch("/api/queue/next", {
 			method: "GET",
 			credentials: "include",
 		});
 
-		console.debug("res");
-		console.debug(res);
-
-		if (res.ok) {
-			setIsFetchQueue(true);
+		if (!res.ok) {
+			const data = await res.json();
+			throw new Error(`${data.message}`);
 		}
-		else {
-			const j = await res.json();
-			console.error(`res error: ${JSON.stringify(j)}`);
+	}, "fetchQueueNext");
+}
 
-			if (setError) {
-				setError(`${j.message}`);
-			}
-		}
-	}
-	catch (err) {
-		console.error("Error calling /api/queue/next", err);
-		if (setError) {
-			setError(`${err}`);
-		}
-	}
-};
-
-
-export async function fetchQueueShuffle(
-	setIsFetchQueue: React.Dispatch<React.SetStateAction<boolean>>,
-	setError: React.Dispatch<React.SetStateAction<string>> | null = null
-) {
-	console.debug("fetchQueueShuffle");
-
-	try {
+export function fetchQueueShuffle(): Promise<Result<void>> {
+	return safeAsync(async () => {
 		const res = await fetch("/api/queue/shuffle", {
 			method: "GET",
 			credentials: "include",
-			cache: "no-store"
 		});
 
-		console.debug("res");
-		console.debug(res);
-
-		if (res.ok) {
-			setIsFetchQueue(true);
+		if (!res.ok) {
+			const data = await res.json();
+			throw new Error(`${data.message}`);
 		}
-		else {
-			const j = await res.json();
-			console.error(`res error: ${JSON.stringify(j)}`);
-			if (setError) {
-				setError(j.message);
-			}
-		}
-	}
-	catch (err) {
-		console.error("Error calling /api/queue/next", err);
-		if (setError) {
-			setError(`${err}`);
-		}
-	}
+	}, "fetchQueueShuffle");
 }
 
-
-export async function fetchQueue(
-	setQueue: React.Dispatch<React.SetStateAction<number[]>>,
-	setError: React.Dispatch<React.SetStateAction<string>>
-) {
-	console.debug("fetchQueue");
-
-	try {
+export function fetchQueue(): Promise<Result<number[]>> {
+	return safeAsync(async () => {
 		const res = await fetch("/api/queue", {
 			method: "GET",
 			credentials: "include",
-			cache: "no-store",
 		});
 
-		console.debug("res");
-		console.debug(res);
-
-		const j = await res.json()
 		if (!res.ok) {
-			console.error(`res error: ${JSON.stringify(j)}`);
-			setError(j.message);
+			const data = await res.json();
+			throw new Error(`${data.message}`);
 		}
-		else {
-			setQueue(j);
-			setError("");
-		}
-	}
-	catch (err) {
-		console.error(`API call failed: ${err}`);
-		setError(`${err}`);
-	}
+
+		const queue: number[] = await res.json();
+		return queue;
+	}, "fetchQueue");
 }
 
-export async function fetchEpdRefresh() {
-	console.debug("fetchEpdRefresh");
-	try {
+export function fetchEpdRefresh(): Promise<Result<void>> {
+	return safeAsync(async () => {
 		const res = await fetch("/api/epd/refresh", {
 			method: "GET",
 			credentials: "include",
-			cache: "no-store",
 		});
 
-		console.debug("res");
-		console.debug(res)
-
 		if (!res.ok) {
-			const j = await res.json();
-			console.error(`res error: ${j.message}`);
+			const data = await res.json();
+			throw new Error(`${data.message}`);
 		}
-	}
-	catch (err) {
-		console.error(`API call failed: ${err}`)
-	}
+	}, "fetchEpdRefresh");
 }
 
-export async function fetchEpdClear() {
-	console.debug("fetchEpdClear")
-	try {
+export function fetchEpdClear(): Promise<Result<void>> {
+	return safeAsync(async () => {
 		const res = await fetch("/api/epd/clear", {
 			method: "GET",
 			credentials: "include",
-			cache: "no-store",
 		});
 
-		console.debug("res");
-		console.debug(res)
-
 		if (!res.ok) {
-			const j = await res.json();
-			console.error(`res error: ${j.message}`);
+			const data = await res.json();
+			throw new Error(`${data.message}`);
 		}
-	}
-	catch (err) {
-		console.error(`API call failed: ${err}`)
-	}
-};
+	}, "fetchEpdClear");
+}

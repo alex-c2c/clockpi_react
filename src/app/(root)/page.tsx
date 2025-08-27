@@ -1,4 +1,4 @@
-import TimeDiv from "@/app/(root)/components/TimeDiv"
+import TimeDiv from "@/app/(root)/components/TimeDiv";
 import EpdDiv from "@/app/(root)/components/EpdDiv";
 import CarouselDiv from "@/app/(root)/components/CarouselDiv";
 import ScheduleDiv from "@/app/(root)/components/ScheduleDiv";
