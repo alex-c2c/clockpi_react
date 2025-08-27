@@ -13,3 +13,23 @@ export function shortenFileName(fileName: string, maxLength: number = 64): strin
 
 	return `${front}...${back}${ext}`;
 }
+
+export function handleError(error: unknown, context: string = ""): string {
+	let message = "An unexpected error occurred";
+
+	if (error instanceof Error) {
+		message = error.message;
+	}
+	else if (typeof error === "string") {
+		message = error;
+	}
+
+	if (context) {
+		console.error(`[${context}]`, error);
+	}
+	else {
+		console.error(error);
+	}
+
+	return message;
+}

@@ -4,6 +4,25 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import { User } from "@/types/User";
+import { Result, safeAsync } from "@/lib/result";
+
+function fetchLogin(username: string, password: string): Promise<Result<User>> {
+	return safeAsync(async () => {
+		const res = await fetch("/api/auth/login", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			credentials: "include",
+			body: JSON.stringify({ username, password })
+		});
+		
+		if (!res.ok) {
+			const data = await res.json();
+			throw new Error(`${data.message}`);
+		}
+		
+		return res.json();
+	}, "fetchLogin");
+}
 
 export default function LoginPage() {
 	const searchParams = useSearchParams()
@@ -17,34 +36,19 @@ export default function LoginPage() {
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setError("");
-
-		try {
-			const res = await fetch("/api/auth/login", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				credentials: "include",
-				body: JSON.stringify({ username, password }),
-			});
-
-			const data = await res.json();
-			if (res.ok) {
-				const user: User = data;
-				setUser(user);
-				router.push(redirectPath);
-			}
-			else {
-				setUser(null);
-				setError(data.message || "Login failed");
-			}
+		
+		const result = await fetchLogin(username, password);
+		
+		if (result.success) {
+			const user: User = result.data;
+			setUser(user);
+			router.push(redirectPath);
 		}
-		catch (err) {
-			console.error("Login error:", err);
-			setError("An error occurred. Please try again.");
+		else {
+			setUser(null);
+			setError(result.error);
 		}
 	};
-
 
 	return (
 		<div className="h-screen flex items-center justify-center bg-stone-900">

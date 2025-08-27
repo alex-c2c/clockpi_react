@@ -3,6 +3,24 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "@/context/UserContext";
+import { Result, safeAsync } from "@/lib/result";
+
+function fetchLogout(): Promise<Result<null>> {
+	return safeAsync(async () => {
+		const res = await fetch("/api/auth/logout", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			credentials: "include"
+		});
+
+		if (!res.ok) {
+			const data = await res.json();
+			throw new Error(`${data.message}`);
+		}
+
+		return null;
+	}, "fetchLogout");
+}
 
 export default function NavbarName() {
 	const router = useRouter();
@@ -24,28 +42,15 @@ export default function NavbarName() {
 	}, []);
 
 	const handleLogout = async () => {
-		try {
-			setLoading(true);
-
-			const res = await fetch("/api/auth/logout", {
-				method: "POST",
-				credentials: "include",
-			});
-
-			if (res.ok) {
-				setUser(null);
-				router.push("/");
-			}
-			else {
-				console.error("Logout failed");
-			}
+		setLoading(true);
+		
+		const result = await fetchLogout();
+		if (result.success) {
+			setUser(null);
+			router.push("/");
 		}
-		catch (err) {
-			console.error("Login error:", err);
-		}
-		finally {
-			setLoading(false);
-		}
+		
+		setLoading(false);
 	};
 
 	const handleLogin = async () => {
