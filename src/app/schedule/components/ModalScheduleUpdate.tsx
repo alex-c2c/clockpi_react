@@ -1,22 +1,28 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { ScheduleProps } from "@/app/schedule/types/Schedule";
 import { DAYS_OF_WEEK } from "@/app/schedule/lib/consts";
-import { fetchScheduleDelete, fetchScheduleUpdate } from "@/app/schedule/lib/api";
+import {
+	fetchScheduleDelete,
+	fetchScheduleUpdate,
+} from "@/app/schedule/lib/api";
 import { checkDataValidity, getEndTime } from "@/app/schedule/lib/utils";
+import { Result } from "@/lib/result";
 
 export default function ModalScheduleUpdate({
 	selectedSchedule,
 	setIsOpen,
-	setIsFetchSchedules
+	setIsFetchSchedules,
 }: {
-	selectedSchedule: ScheduleProps,
-	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-	setIsFetchSchedules: React.Dispatch<React.SetStateAction<boolean>>
+	selectedSchedule: ScheduleProps;
+	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsFetchSchedules: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
 	const [id] = useState<number>(selectedSchedule.id);
-	const [startTime, setStartTime] = useState<string>(selectedSchedule.startTime);
+	const [startTime, setStartTime] = useState<string>(
+		selectedSchedule.startTime
+	);
 	const [endTime, setEndTime] = useState<string>("12:01");
 	const [duration, setDuration] = useState<number>(selectedSchedule.duration);
 	const [days, setDays] = useState<string[]>(selectedSchedule.days);
@@ -24,16 +30,14 @@ export default function ModalScheduleUpdate({
 
 	const toggleDay = (day: string) => {
 		console.debug(day);
-		setDays(prev =>
-			prev.includes(day)
-				? prev.filter(d => d !== day)
-				: [...prev, day]
+		setDays((prev) =>
+			prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
 		);
 	};
 
 	const handleClickClose = async () => {
 		setIsOpen(false);
-	}
+	};
 
 	const handleClickUpdate = async () => {
 		// cheeck ID before fetching API
@@ -43,7 +47,11 @@ export default function ModalScheduleUpdate({
 		}
 
 		// validate data before fetching API
-		const dataError: string | null = checkDataValidity(startTime, duration, days);
+		const dataError: string | null = checkDataValidity(
+			startTime,
+			duration,
+			days
+		);
 		if (dataError != null) {
 			setError(dataError);
 			return;
@@ -54,45 +62,43 @@ export default function ModalScheduleUpdate({
 			startTime: startTime,
 			duration: duration,
 			days: days,
-			isEnabled: true
+			isEnabled: true,
 		};
 
-		const err: string = await fetchScheduleUpdate(currentSchedule);
-		if (!err) {
+		const result: Result<void> = await fetchScheduleUpdate(currentSchedule);
+		if (!result.success) {
+			setError(result.error);
+		} else {
 			setIsOpen(false);
 			setIsFetchSchedules(true);
-		}
-		else {
-			setError(err);
 		}
 	};
 
 	const handleClickDelete = async () => {
-		const err: string = await fetchScheduleDelete(id);
-		if (!err) {
+		const result: Result<void> = await fetchScheduleDelete(id);
+		if (!result.success) {
+			setError(result.error);
+		} else {
 			setIsOpen(false);
 			setIsFetchSchedules(true);
 		}
-		else {
-			setError(err);
-		}
-	}
+	};
 
 	useEffect(() => {
 		setEndTime(getEndTime(startTime, duration));
-	}, [startTime, duration])
+	}, [startTime, duration]);
 
 	useEffect(() => {
 		const handleEscKeyDown = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') {
+			if (event.key === "Escape") {
 				setIsOpen(false);
 			}
 		};
 
-		window.addEventListener('keydown', handleEscKeyDown);
+		window.addEventListener("keydown", handleEscKeyDown);
 
 		return () => {
-			window.removeEventListener('keydown', handleEscKeyDown);
+			window.removeEventListener("keydown", handleEscKeyDown);
 		};
 	}, [setIsOpen]);
 
@@ -102,8 +108,8 @@ export default function ModalScheduleUpdate({
 				{/* Overlay Background */}
 				<div
 					onClick={handleClickClose}
-					className="absolute inset-0 bg-black opacity-50">
-				</div>
+					className="absolute inset-0 bg-black opacity-50"
+				></div>
 
 				{/* Model Content */}
 				<div className="relative w-full max-w-sm bg-stone-700 p-6 rounded-2xl shadow-lg text-center items-center justify-center">
@@ -119,16 +125,20 @@ export default function ModalScheduleUpdate({
 
 					<div className="grid grid-cols-2 gap-4 mb-6">
 						{/* Row 1 */}
-						<label className="self-center text-right tracking-wide font-semibold">Start Time</label>
+						<label className="self-center text-right tracking-wide font-semibold">
+							Start Time
+						</label>
 						<input
 							type="time"
 							value={startTime}
-							onChange={e => setStartTime(e.target.value)}
+							onChange={(e) => setStartTime(e.target.value)}
 							className="border p-2 rounded w-[95px]"
 						/>
 
 						{/* Row 2 */}
-						<label className="self-center text-right tracking-wide font-semibold">End Time</label>
+						<label className="self-center text-right tracking-wide font-semibold">
+							End Time
+						</label>
 						<input
 							type="time"
 							value={endTime}
@@ -137,27 +147,34 @@ export default function ModalScheduleUpdate({
 						/>
 
 						{/* Row 3 */}
-						<label className="self-center text-right tracking-wide font-semibold">Duration (min)</label>
+						<label className="self-center text-right tracking-wide font-semibold">
+							Duration (min)
+						</label>
 						<input
 							type="number"
 							min="1"
 							max="1440"
 							value={duration}
-							onChange={e => setDuration(parseInt(e.target.value))}
+							onChange={(e) =>
+								setDuration(parseInt(e.target.value))
+							}
 							className="border p-2 rounded w-[95px]"
 						/>
 
 						{/* Row 4 */}
-						<label className="self-start text-right tracking-wide font-semibold">Days</label>
+						<label className="self-start text-right tracking-wide font-semibold">
+							Days
+						</label>
 						<div className="flex flex-col gap-2">
 							{DAYS_OF_WEEK.map((day) => (
 								<button
 									key={day}
 									onClick={() => toggleDay(day)}
-									className={`px-3 py-1 rounded-lg w-[95px] ${days.includes(day)
-										? "bg-green-500 text-white hover:bg-green-600"
-										: "bg-neutral-600 text-neutral-400 hover:bg-neutral-500"
-										}`}
+									className={`px-3 py-1 rounded-lg w-[95px] ${
+										days.includes(day)
+											? "bg-green-500 text-white hover:bg-green-600"
+											: "bg-neutral-600 text-neutral-400 hover:bg-neutral-500"
+									}`}
 								>
 									{day.toUpperCase()}
 								</button>
@@ -181,5 +198,5 @@ export default function ModalScheduleUpdate({
 				</div>
 			</div>
 		</div>
-	)
+	);
 }

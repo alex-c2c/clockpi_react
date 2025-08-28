@@ -1,114 +1,59 @@
 import { ScheduleProps } from "@/app/schedule/types/Schedule";
+import { Result, safeAsync } from "@/lib/result";
 
-export async function fetchScheduleCreate(
-	schedule: ScheduleProps
-): Promise<string>
-{
-	console.debug("fetchScheduleCreate");
-	const data = {
-		startTime: schedule.startTime,
-		duration: schedule.duration,
-		days: schedule.days,
-		isEnabled: true
-	}
-
-	try {
+export function fetchScheduleCreate(
+	newSchedule: ScheduleProps
+): Promise<Result<void>> {
+	return safeAsync(async () => {
 		const res = await fetch("/api/schedule/create", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 			},
 			credentials: "include",
-			cache: "no-store",
-			body: JSON.stringify(data),
+			body: JSON.stringify(newSchedule),
 		});
-		
-		console.debug("res");
-		console.debug(res);
 
 		if (!res.ok) {
-			const j = await res.json()
-			
-			console.error(`res error: ${JSON.stringify(j)}`);
-			
-			return j.message
+			const data = await res.json();
+			throw new Error(`${data.message}`);
 		}
-	}
-	catch (err) {
-		console.error(`API call failed: ${err}`);
-		return `${err}`;
-	}
-
-	// success
-	return "";
+	}, "fetchScheduleCreate");
 }
 
-export async function fetchScheduleDelete(
-	id: number,
-): Promise<string>
-{
-	console.debug("fetchScheduleDelete");
-	try {
+export function fetchScheduleDelete(id: number): Promise<Result<void>> {
+	return safeAsync(async () => {
 		const res = await fetch(`/api/schedule/${id}`, {
 			method: "DELETE",
 			headers: {
 				"Content-Type": "application/json",
 			},
 			credentials: "include",
-			cache: "no-store",
 		});
-		
-		console.debug("res");
-		console.debug(res);
 
 		if (!res.ok) {
-			const j = await res.json();
-			
-			console.error(`res error: ${JSON.stringify(j)}`);
-
-			return j.message;
+			const data = await res.json();
+			throw new Error(`${data.message}`);
 		}
-	}
-	catch (err) {
-		console.error(`API call failed: ${err}`);
-		return `${err}`;
-	}
-
-	// success
-	return "";
+	}, "fetchScheduleDelete");
 }
 
 export async function fetchScheduleUpdate(
 	schedule: ScheduleProps
-): Promise<string>
-{
-	console.debug("fetchScheduleUpdate");
-	try {
+): Promise<Result<void>> {
+	return safeAsync(async () => {
 		const res = await fetch(`/api/schedule/${schedule.id}`, {
 			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json",
 			},
 			credentials: "include",
-			cache: "no-store",
 			body: JSON.stringify(schedule),
 		});
 
-		console.debug("res");
-		console.debug(res);
-		
 		if (!res.ok) {
-			const j = await res.json()
-			
-			console.error(`res error: ${JSON.stringify(j)}`);
-			return j.message;
+			const data = await res.json();
+			throw new Error(`${data.message}`);
 		}
-	}
-	catch (err) {
-		console.error(`API call failed: ${err}`);
-		return `${err}`;
-	}
-	
-	// success
-	return ""
+	}, "fetchScheduleUpdate");
 }

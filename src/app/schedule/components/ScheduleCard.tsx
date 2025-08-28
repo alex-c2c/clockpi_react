@@ -1,17 +1,19 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
+
 import { ScheduleProps } from "@/app/schedule/types/Schedule";
 import { DAYS_OF_WEEK } from "@/app/schedule/lib/consts";
 import { getEndTime } from "@/app/schedule/lib/utils";
 import { fetchScheduleUpdate } from "@/app/schedule/lib/api";
+import { Result } from "@/lib/result";
 
 export default function ScheduleCard({
 	schedule,
-	setError
+	setError,
 }: {
-	schedule: ScheduleProps,
-	setError: React.Dispatch<React.SetStateAction<string>>,
+	schedule: ScheduleProps;
+	setError: React.Dispatch<React.SetStateAction<string>>;
 }) {
 	const [scheduleProps] = useState<ScheduleProps>(schedule);
 	const endTime = getEndTime(schedule.startTime, schedule.duration);
@@ -23,14 +25,14 @@ export default function ScheduleCard({
 
 		const data: ScheduleProps = {
 			...scheduleProps,
-			isEnabled: !isEnabled
-		}
+			isEnabled: !isEnabled,
+		};
 
-		const err: string = await fetchScheduleUpdate(data);
-		if (err) {
-			setError(err);
+		const result: Result<void> = await fetchScheduleUpdate(data);
+		if (!result.success) {
+			setError(result.error);
 		}
-	}
+	};
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -38,11 +40,10 @@ export default function ScheduleCard({
 		};
 
 		handleResize(); // set on mount
-		window.addEventListener('resize', handleResize);
+		window.addEventListener("resize", handleResize);
 
-		return () => window.removeEventListener('resize', handleResize);
+		return () => window.removeEventListener("resize", handleResize);
 	}, []);
-
 
 	return (
 		<div className="relative">
@@ -53,30 +54,57 @@ export default function ScheduleCard({
 					<div className="flex flex-wrap justify-between items-start mb-2 w-full">
 						<div className="flex gap-12 sm:gap-16 flex-wrap">
 							<div>
-								<div className="text-m text-neutral-400 font-light">Start</div>
-								<div className="text-xl font-mono">{schedule.startTime}</div>
+								<div className="text-m text-neutral-400 font-light">
+									Start
+								</div>
+								<div className="text-xl font-mono">
+									{schedule.startTime}
+								</div>
 							</div>
 							<div>
-								<div className="text-m text-neutral-400 font-light">End</div>
-								<div className="text-xl font-mono">{endTime}</div>
+								<div className="text-m text-neutral-400 font-light">
+									End
+								</div>
+								<div className="text-xl font-mono">
+									{endTime}
+								</div>
 							</div>
 							<div>
-								<div className="text-m text-neutral-400 font-light">Duration</div>
-								<div className="text-xl font-mono">{schedule.duration}</div>
+								<div className="text-m text-neutral-400 font-light">
+									Duration
+								</div>
+								<div className="text-xl font-mono">
+									{schedule.duration}
+								</div>
 							</div>
 						</div>
 
 						{/* Toggle aligned to right */}
 						<div className="flex items-center sm:mt-4">
-							<label onClick={(e) => e.stopPropagation()} className="inline-flex items-center cursor-pointer">
+							<label
+								onClick={(e) => e.stopPropagation()}
+								className="inline-flex items-center cursor-pointer"
+							>
 								<input
 									type="checkbox"
 									className="sr-only"
 									checked={isEnabled}
 									onChange={handleToggleActive}
 								/>
-								<div className={`w-12 h-6 rounded-full transition-colors duration-300 ${isEnabled ? "bg-green-500" : "bg-neutral-400"}`}>
-									<div className={`w-6 h-6 bg-white rounded-full shadow transform transition-transform duration-300 ${isEnabled ? "translate-x-6" : "translate-x-0"}`} />
+								<div
+									className={`w-12 h-6 rounded-full transition-colors duration-300 ${
+										isEnabled
+											? "bg-green-500"
+											: "bg-neutral-400"
+									}`}
+								>
+									<div
+										className={`w-6 h-6 bg-white rounded-full shadow transform transition-transform duration-300 ${
+											isEnabled
+												? "translate-x-6"
+												: "translate-x-0"
+										}`}
+									/>
 								</div>
 							</label>
 						</div>
@@ -87,10 +115,11 @@ export default function ScheduleCard({
 						{DAYS_OF_WEEK.map((day) => (
 							<span
 								key={day}
-								className={`flex-1 py-1 rounded-lg font-mono ${schedule.days.includes(day.slice(0, 3))
+								className={`flex-1 py-1 rounded-lg font-mono ${
+									schedule.days.includes(day.slice(0, 3))
 										? "bg-green-500 text-white"
 										: "bg-neutral-600 text-neutral-400"
-									}`}
+								}`}
 							>
 								{isMobile ? day.slice(0, 1) : day.slice(0, 3)}
 							</span>

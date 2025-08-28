@@ -1,10 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react";
+
 import { ScheduleProps } from "@/app/schedule/types/Schedule";
 import { DAYS_OF_WEEK } from "@/app/schedule/lib/consts";
-import { fetchScheduleCreate as fetchScheduleCreate } from "@/app/schedule/lib/api";
+import { fetchScheduleCreate } from "@/app/schedule/lib/api";
 import { checkDataValidity, getEndTime } from "@/app/schedule/lib/utils";
+import { Result } from "@/lib/result"
 
 export default function ModalScheduleCreate({
 	setIsOpen,
@@ -49,13 +51,13 @@ export default function ModalScheduleCreate({
 		};
 
 		// fetch API and await result
-		const err: string = await fetchScheduleCreate(newSchedule);
-		if (!err) {
-			setIsOpen(false);
-			setIsFetchData(true);
+		const result: Result<void> = await fetchScheduleCreate(newSchedule);
+		if (!result.success) {
+			setError(result.error);
 		}
 		else {
-			setError(err);
+			setIsOpen(false);
+			setIsFetchData(true);
 		}
 	};
 

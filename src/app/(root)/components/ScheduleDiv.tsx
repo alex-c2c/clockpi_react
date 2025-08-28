@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { ButtonScheduleEdit } from "@/app/(root)/components/Buttons";
 import { Result, safeAsync } from "@/lib/result";
 
-export function fetchScheduleStatus(): Promise<Result<boolean>> {
+function fetchScheduleStatus(): Promise<Result<boolean>> {
 	return safeAsync(async () => {
 		const session = (await cookies()).get("session");
 
