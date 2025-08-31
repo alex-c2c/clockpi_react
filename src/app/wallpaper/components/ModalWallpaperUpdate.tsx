@@ -1,35 +1,55 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { WallpaperProps, WallpaperUpdateProps } from "../types/Wallpaper";
-import { fetchWallpaperDelete, fetchWallpaperUpdate } from "../lib/api";
-import { ALLOWED_COLORS } from "../lib/consts";
+
+import {
+	WallpaperProps,
+	WallpaperUpdateProps,
+} from "@/app/wallpaper/types/Wallpaper";
+import {
+	fetchWallpaperDelete,
+	fetchWallpaperUpdate,
+} from "@/app/wallpaper/lib/api";
+import { ALLOWED_COLORS } from "@/app/wallpaper/lib/consts";
+import { Result } from "@/lib/result";
 
 export default function ModalWallpaperUpdate({
 	selectedWallpaper,
 	setIsOpen,
-	setIsFetchWallpapers
+	setIsFetchWallpapers,
 }: {
-	selectedWallpaper: WallpaperProps,
-	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-	setIsFetchWallpapers: React.Dispatch<React.SetStateAction<boolean>>
+	selectedWallpaper: WallpaperProps;
+	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsFetchWallpapers: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
 	const [id] = useState<number>(selectedWallpaper.id);
 	const [error, setError] = useState<string | null>(null);
 	const imageRef = useRef<HTMLImageElement>(null);
 
 	// Wallpaper settings
-	const [textColor, setTextColor] = useState<string>(selectedWallpaper.color.toLowerCase());
-	const [textShadow, setTextShadow] = useState<string>(selectedWallpaper.shadow.toLowerCase());
+	const [textColor, setTextColor] = useState<string>(
+		selectedWallpaper.color.toLowerCase()
+	);
+	const [textShadow, setTextShadow] = useState<string>(
+		selectedWallpaper.shadow.toLowerCase()
+	);
 
 	const [showTextColor, setShowTextColor] = useState<boolean>(false);
 	const [showTextShadow, setShowTextShadow] = useState<boolean>(false);
 
-	//const [time] = useState<string>(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }));
-	const time = "23:59";
-	
+	const [time] = useState<string>(
+		new Date().toLocaleTimeString([], {
+			hour: "2-digit",
+			minute: "2-digit",
+			hour12: false,
+		})
+	);
+
 	// for dragging
-	const [position, setPosition] = useState({ xPercent: selectedWallpaper.x, yPercent: selectedWallpaper.y });
-	const [isDragging, setIsDragging] = useState(false);
+	const [position, setPosition] = useState({
+		xPercent: selectedWallpaper.x,
+		yPercent: selectedWallpaper.y,
+	});
+	const [isDragging, setIsDragging] = useState<boolean>(false);
 	const offsetRef = useRef({ x: 0, y: 0 });
 	const containerRef = useRef<HTMLDivElement>(null);
 
@@ -37,47 +57,63 @@ export default function ModalWallpaperUpdate({
 	const BASE_WIDTH = 89;
 	const BASE_HEIGHT = 23;
 	const ASPECT_RATIO = BASE_HEIGHT / BASE_WIDTH;
-	const [size, setSize] = useState({ width: BASE_WIDTH, height: BASE_WIDTH * ASPECT_RATIO });
+	const [size, setSize] = useState({
+		width: BASE_WIDTH,
+		height: BASE_WIDTH * ASPECT_RATIO,
+	});
 	const isResizing = useRef(false);
-	const scale = Math.max(1, Math.min(size.width / BASE_WIDTH, size.height / (BASE_WIDTH * ASPECT_RATIO)));
-	
-	const startResize = (
-		e: React.MouseEvent | React.TouchEvent
-	) => {
+	const scale = Math.max(
+		1,
+		Math.min(
+			size.width / BASE_WIDTH,
+			size.height / (BASE_WIDTH * ASPECT_RATIO)
+		)
+	);
+
+	const startResize = (e: React.MouseEvent | React.TouchEvent) => {
 		e.stopPropagation(); // Prevent conflict with move drag
 		isResizing.current = true;
 	};
 
-	const onResize = useCallback((clientX: number, clientY: number) => {
-		if (!isResizing.current || !imageRef.current) return;
-		
-		const rect = imageRef.current.getBoundingClientRect();
+	const onResize = useCallback(
+		(clientX: number, clientY: number) => {
+			if (!isResizing.current || !imageRef.current) return;
 
-		// Convert percentage position to pixels
-		const originX = (position.xPercent / 100) * rect.width;
-		const originY = (position.yPercent / 100) * rect.height;
-		
-		const maxWidth = rect.width - originX;
-		const maxHeight = rect.height - originY;
-		
-		// Proposed new width and height based on pointer
-		let proposedWidth = clientX - rect.left - originX;
-		let proposedHeight = clientY - rect.top - originY;
-		
-		// Determine new size maintaining aspect ratio
-		if (proposedWidth * ASPECT_RATIO > maxHeight) {
-			proposedHeight = Math.min(maxHeight, Math.max(BASE_HEIGHT, proposedHeight));
-			proposedWidth = proposedHeight * ASPECT_RATIO;
-		} else {
-			proposedWidth = Math.min(maxWidth, Math.max(BASE_WIDTH, proposedWidth));
-			proposedHeight = proposedWidth * ASPECT_RATIO;
-		}
-		
-		setSize({
-			width: proposedWidth,
-			height: proposedHeight,
-		});
-	}, [ASPECT_RATIO, position.xPercent, position.yPercent]);
+			const rect = imageRef.current.getBoundingClientRect();
+
+			// Convert percentage position to pixels
+			const originX = (position.xPercent / 100) * rect.width;
+			const originY = (position.yPercent / 100) * rect.height;
+
+			const maxWidth = rect.width - originX;
+			const maxHeight = rect.height - originY;
+
+			// Proposed new width and height based on pointer
+			let proposedWidth = clientX - rect.left - originX;
+			let proposedHeight = clientY - rect.top - originY;
+
+			// Determine new size maintaining aspect ratio
+			if (proposedWidth * ASPECT_RATIO > maxHeight) {
+				proposedHeight = Math.min(
+					maxHeight,
+					Math.max(BASE_HEIGHT, proposedHeight)
+				);
+				proposedWidth = proposedHeight * ASPECT_RATIO;
+			} else {
+				proposedWidth = Math.min(
+					maxWidth,
+					Math.max(BASE_WIDTH, proposedWidth)
+				);
+				proposedHeight = proposedWidth * ASPECT_RATIO;
+			}
+
+			setSize({
+				width: proposedWidth,
+				height: proposedHeight,
+			});
+		},
+		[ASPECT_RATIO, position.xPercent, position.yPercent]
+	);
 
 	// Start dragging (mouse or touch)
 	const startDrag = (
@@ -102,98 +138,120 @@ export default function ModalWallpaperUpdate({
 	};
 
 	// Drag move (mouse or touch)
-	const onDrag = useCallback((clientX: number, clientY: number) => {
-		if (!isDragging || !imageRef.current) return;
+	const onDrag = useCallback(
+		(clientX: number, clientY: number) => {
+			if (!isDragging || !imageRef.current) return;
 
-		const rect = imageRef.current.getBoundingClientRect();
-		const offsetX = clientX - rect.left - offsetRef.current.x;
-		const offsetY = clientY - rect.top - offsetRef.current.y;
+			const rect = imageRef.current.getBoundingClientRect();
+			const offsetX = clientX - rect.left - offsetRef.current.x;
+			const offsetY = clientY - rect.top - offsetRef.current.y;
 
-		const clampedX = Math.max(0, Math.min(offsetX, rect.width - size.width));
-		const clampedY = Math.max(0, Math.min(offsetY, rect.height - size.height));
+			const clampedX = Math.max(
+				0,
+				Math.min(offsetX, rect.width - size.width)
+			);
+			const clampedY = Math.max(
+				0,
+				Math.min(offsetY, rect.height - size.height)
+			);
 
-		setPosition({
-			xPercent: (clampedX / rect.width) * 100,
-			yPercent: (clampedY / rect.height) * 100,
-		});
-	}, [isDragging, size.width, size.height]);
+			setPosition({
+				xPercent: (clampedX / rect.width) * 100,
+				yPercent: (clampedY / rect.height) * 100,
+			});
+		},
+		[isDragging, size.width, size.height]
+	);
 
 	const stopDragOrResize = () => {
 		setIsDragging(false);
 		isResizing.current = false;
 	};
 
-	const handleMouseMove = useCallback((e: MouseEvent) => {
-		if (isResizing.current) {
-			onResize(e.clientX, e.clientY);
-		} else {
-			onDrag(e.clientX, e.clientY);
-		}
-	}, [onResize, onDrag]);
+	const handleMouseMove = useCallback(
+		(e: MouseEvent) => {
+			if (isResizing.current) {
+				onResize(e.clientX, e.clientY);
+			} else {
+				onDrag(e.clientX, e.clientY);
+			}
+		},
+		[onResize, onDrag]
+	);
 
-	const handleTouchMove = useCallback((e: TouchEvent) => {
-		if (isResizing.current) {
-			onResize(e.touches[0].clientX, e.touches[0].clientY);
-		} else {
-			onDrag(e.touches[0].clientX, e.touches[0].clientY);
-		}
-	}, [onResize, onDrag]);
+	const handleTouchMove = useCallback(
+		(e: TouchEvent) => {
+			if (isResizing.current) {
+				onResize(e.touches[0].clientX, e.touches[0].clientY);
+			} else {
+				onDrag(e.touches[0].clientX, e.touches[0].clientY);
+			}
+		},
+		[onResize, onDrag]
+	);
 
 	const handleFetchImageError = () => {
 		console.error("handleFetchImageError");
 		setError("Unable to fetch wallpaper image");
-	}
+	};
+
+	const handleClickCenterVertical = () => {
+		if (!imageRef.current) return;
+
+		const rect = imageRef.current.getBoundingClientRect();
+		setPosition({
+			...position,
+			yPercent: (((rect.height - size.height) * 0.5) / rect.height) * 100,
+		});
+	};
+
+	const handleClickCenterHorizontal = () => {
+		if (!imageRef.current) return;
+
+		const rect = imageRef.current.getBoundingClientRect();
+		setPosition({
+			...position,
+			xPercent: (((rect.width - size.width) * 0.5) / rect.width) * 100,
+		});
+	};
 
 	const handleClickClose = async () => {
 		setIsOpen(false);
-	}
+	};
 
 	const handleClickUpdate = async () => {
 		if (!imageRef.current) return;
-		
+
 		const wallpaperUpdateProps: WallpaperUpdateProps = {
+			id: id,
 			x: position.xPercent,
 			y: position.yPercent,
-			w: ((size.width / imageRef.current.width) * 100),
-			h: ((size.height / imageRef.current.height) * 100),
+			w: (size.width / imageRef.current.width) * 100,
+			h: (size.height / imageRef.current.height) * 100,
 			color: textColor,
-			shadow: textShadow
-		}
-		
-		const err: string = await fetchWallpaperUpdate(id, wallpaperUpdateProps);
-		if (!err) {
+			shadow: textShadow,
+		};
+
+		const result: Result<void> = await fetchWallpaperUpdate(
+			wallpaperUpdateProps
+		);
+		if (result.success) {
 			setIsOpen(false);
 			setIsFetchWallpapers(true);
-		}
-		else {
-			setError(err);
+		} else {
+			setError(result.error);
 		}
 	};
 
-	const handleCenterTextVertically = () => {
-		if (!imageRef.current) return;
-
-		const rect = imageRef.current.getBoundingClientRect();
-		setPosition({ ...position, yPercent: (((rect.height - size.height) * 0.5) / rect.height) * 100 });
-	}
-
-	const handleCenterTextHorizontally = () => {
-		if (!imageRef.current) return;
-
-		const rect = imageRef.current.getBoundingClientRect();
-		setPosition({ ...position, xPercent: (((rect.width - size.width) * 0.5) / rect.width) * 100 });
-	}
-
 	const handleClickDelete = async () => {
-		const err: string = await fetchWallpaperDelete(id);
-		if (!err) {
+		const result: Result<void> = await fetchWallpaperDelete(id);
+		if (result.success) {
 			setIsOpen(false);
 			setIsFetchWallpapers(true);
+		} else {
+			setError(result.error);
 		}
-		else {
-			setError(err);
-		}
-	}
+	};
 
 	useEffect(() => {
 		const handleEscKeyDown = (event: KeyboardEvent) => {
@@ -222,17 +280,17 @@ export default function ModalWallpaperUpdate({
 			window.removeEventListener("touchend", stopDragOrResize);
 		};
 	}, [handleMouseMove, handleTouchMove]);
-	
+
 	useEffect(() => {
 		if (imageRef.current) {
 			const width = imageRef.current.width * (selectedWallpaper.w / 100);
-			const height = imageRef.current.height * (selectedWallpaper.h / 100);
+			const height =
+				imageRef.current.height * (selectedWallpaper.h / 100);
 			setSize({
 				width: width,
-				height: height
+				height: height,
 			});
-		}
-		else {
+		} else {
 			setSize({ width: BASE_WIDTH, height: BASE_HEIGHT });
 		}
 	}, [selectedWallpaper.w, selectedWallpaper.h]);
@@ -243,8 +301,8 @@ export default function ModalWallpaperUpdate({
 				{/* Overlay Background */}
 				<div
 					onClick={handleClickClose}
-					className="absolute inset-0 bg-black opacity-50">
-				</div>
+					className="absolute inset-0 bg-black opacity-50"
+				></div>
 
 				{/* Model Content */}
 				<div className="relative w-full max-w-4xl bg-stone-800 p-6 rounded-2xl shadow-lg text-center items-center justify-center">
@@ -259,7 +317,10 @@ export default function ModalWallpaperUpdate({
 					)}
 
 					{/* Image with draggable overlay */}
-					<div className="relative inline-block mb-4" ref={containerRef}>
+					<div
+						className="relative inline-block mb-4"
+						ref={containerRef}
+					>
 						<img
 							ref={imageRef}
 							src={`/api/wallpaper-proxy?id=${id}`}
@@ -270,7 +331,8 @@ export default function ModalWallpaperUpdate({
 						/>
 
 						{/* Draggable Text Overlay */}
-						<div className="absolute cursor-move rounded-xl select-none outline-stone-400 outline-4 sm:outline-6"
+						<div
+							className="absolute cursor-move rounded-xl select-none outline-stone-400 outline-4 sm:outline-6"
 							style={{
 								left: `${position.xPercent}%`,
 								top: `${position.yPercent}%`,
@@ -288,9 +350,12 @@ export default function ModalWallpaperUpdate({
 								{/* SHADOW SPAN */}
 								<span
 									className={`font-time font-bold text-3xl relative
-										${(textShadow == "white" || textShadow == "black") ?
-											`text-${textShadow}` :
-											`text-${textShadow}-500`}`}
+										${
+											textShadow == "white" ||
+											textShadow == "black"
+												? `text-${textShadow}`
+												: `text-${textShadow}-500`
+										}`}
 									style={{
 										transform: `scale(${scale})`,
 										transformOrigin: "center",
@@ -303,9 +368,12 @@ export default function ModalWallpaperUpdate({
 								{/* FRONT SPAN */}
 								<span
 									className={`font-time font-bold text-3xl absolute pl-0.5 pb-0.25 sm:pl-0.5 sm:pb-0.25
-										${(textColor == "white" || textColor == "black") ?
-											`text-${textColor}` :
-											`text-${textColor}-500`}`}
+										${
+											textColor == "white" ||
+											textColor == "black"
+												? `text-${textColor}`
+												: `text-${textColor}-500`
+										}`}
 									style={{
 										transform: `scale(${scale})`,
 										transformOrigin: "center",
@@ -314,7 +382,6 @@ export default function ModalWallpaperUpdate({
 									{time}
 								</span>
 							</div>
-
 
 							{/* Resize handle */}
 							<div
@@ -338,19 +405,18 @@ export default function ModalWallpaperUpdate({
 					{/* ALIGNMENT BUTTONS */}
 					<div className="flex justify-center gap-2 mb-4">
 						<button
-							onClick={handleCenterTextVertically}
+							onClick={handleClickCenterVertical}
 							className="w-full px-2 py-2 rounded-lg bg-stone-600 text-white hover:bg-stone-700 hover:text-neutral-300"
 						>
 							Center Vertically
 						</button>
 						<button
-							onClick={handleCenterTextHorizontally}
+							onClick={handleClickCenterHorizontal}
 							className="w-full px-2 py-2 rounded-lg bg-stone-600 text-white hover:bg-stone-700 hover:text-neutral-300"
 						>
 							Center Horizontally
 						</button>
 					</div>
-
 
 					<div className="flex justify-center gap-2 mb-4">
 						<div className="relative w-full">
@@ -360,10 +426,15 @@ export default function ModalWallpaperUpdate({
 								className="w-full flex items-center text-center justify-center gap-2 px-3 py-2 rounded-lg bg-stone-600 text-white hover:bg-stone-700"
 							>
 								<span>Color:</span>
-								<span className={`w-3 h-3 rounded-full capitalize
-										${(textColor === "white" || textColor === "black") ?
-										`bg-${textColor}` :
-										`bg-${textColor}-500`}`} />
+								<span
+									className={`w-3 h-3 rounded-full capitalize
+										${
+											textColor === "white" ||
+											textColor === "black"
+												? `bg-${textColor}`
+												: `bg-${textColor}-500`
+										}`}
+								/>
 								<span className="capitalize">{textColor}</span>
 							</button>
 							{/* Text Color Dropdown */}
@@ -378,11 +449,17 @@ export default function ModalWallpaperUpdate({
 											}}
 											className="w-full flex justify-center items-center px-2 py-1 hover:bg-stone-700  gap-2 cursor-pointer text-white"
 										>
-											<span className={`w-3 h-3 rounded-full ${(color === "white" || color === "black")
-												? `bg-${color}`
-												: `bg-${color}-500`
-												}`} />
-											<span className="capitalize">{color}</span>
+											<span
+												className={`w-3 h-3 rounded-full ${
+													color === "white" ||
+													color === "black"
+														? `bg-${color}`
+														: `bg-${color}-500`
+												}`}
+											/>
+											<span className="capitalize">
+												{color}
+											</span>
 										</li>
 									))}
 								</ul>
@@ -393,15 +470,24 @@ export default function ModalWallpaperUpdate({
 							<div className="w-full">
 								{/* Text Shadow Button */}
 								<button
-									onClick={() => setShowTextShadow(!showTextShadow)}
+									onClick={() =>
+										setShowTextShadow(!showTextShadow)
+									}
 									className="w-full flex items-center text-center justify-center gap-2 px-3 py-2 rounded-lg bg-stone-600 text-white hover:bg-stone-700"
 								>
 									<span>Shadow: </span>
-									<span className={`w-3 h-3 rounded-full capitalize
-										${(textShadow === "white" || textShadow === "black") ?
-											`bg-${textShadow}` :
-											`bg-${textShadow}-500`}`} />
-									<span className="capitalize">{textShadow}</span>
+									<span
+										className={`w-3 h-3 rounded-full capitalize
+										${
+											textShadow === "white" ||
+											textShadow === "black"
+												? `bg-${textShadow}`
+												: `bg-${textShadow}-500`
+										}`}
+									/>
+									<span className="capitalize">
+										{textShadow}
+									</span>
 								</button>
 							</div>
 							{/* Text Shadow Dropdown */}
@@ -416,16 +502,21 @@ export default function ModalWallpaperUpdate({
 											}}
 											className="w-full flex justify-center items-center px-2 py-1 hover:bg-stone-700  gap-2 cursor-pointer text-white"
 										>
-											<span className={`w-3 h-3 rounded-full ${(color === "white" || color === "black")
-												? `bg-${color}`
-												: `bg-${color}-500`
-												}`} />
-											<span className="capitalize">{color}</span>
+											<span
+												className={`w-3 h-3 rounded-full ${
+													color === "white" ||
+													color === "black"
+														? `bg-${color}`
+														: `bg-${color}-500`
+												}`}
+											/>
+											<span className="capitalize">
+												{color}
+											</span>
 										</li>
 									))}
 								</ul>
 							)}
-
 						</div>
 					</div>
 

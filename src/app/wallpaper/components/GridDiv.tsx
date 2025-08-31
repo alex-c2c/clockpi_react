@@ -1,34 +1,37 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState } from "react";
-import { WallpaperProps } from "../types/Wallpaper";
-import WallpaperCard from "./WallpaperCard";
-import ModalWallpaperUpdate from "./ModalWallpaperUpdate";
+
+import { WallpaperProps } from "@/app/wallpaper/types/Wallpaper";
+import WallpaperCard from "@/app/wallpaper/components/WallpaperCard";
+import ModalWallpaperUpdate from "@/app/wallpaper/components/ModalWallpaperUpdate";
 
 export default function GridDiv({
 	wallpapers,
-	setIsFetchWallpapers
+	setIsFetchWallpapers,
 }: {
-	wallpapers: WallpaperProps[] | null,
-	setIsFetchWallpapers: React.Dispatch<React.SetStateAction<boolean>>
+	wallpapers: WallpaperProps[];
+	setIsFetchWallpapers: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-	const [isModalWallpaperUpdateOpen, setIsModalWallpaperUpdateOpen] = useState<boolean>(false);
-	const [selectedWallpaper, setSelectedWallpaper] = useState<WallpaperProps | null>(null);
+	const [isModalWallpaperUpdateOpen, setIsModalWallpaperUpdateOpen] =
+		useState<boolean>(false);
+	const [selectedWallpaper, setSelectedWallpaper] =
+		useState<WallpaperProps | null>(null);
 
 	const handleClick = (id: number) => {
 		setIsModalWallpaperUpdateOpen(true);
-		
-		const wallpaper: WallpaperProps | undefined = wallpapers?.find(item => item.id === id);
+
+		const wallpaper: WallpaperProps | undefined = wallpapers.find(
+			(item) => item.id === id
+		);
 		if (wallpaper) {
 			setSelectedWallpaper(wallpaper);
-		}
-		else {
+		} else {
 			setSelectedWallpaper(null);
 		}
 
 		console.debug(`clicked on id: ${JSON.stringify(wallpaper)}`);
-	}
+	};
 
 	return (
 		<div className="w-full max-w-4xl p-4 sm:p-6 mx-auto bg-stone-800 rounded-2xl flex flex-col justify-center">
@@ -39,15 +42,23 @@ export default function GridDiv({
 
 			{/* Wallpaper Card List */}
 			<div className="grid grid-cols-3 gap-4">
-				{wallpapers?.map((wallpaper, index) => (
-					<div onClick={() => handleClick(wallpaper.id)} key={index} className="hover:scale-105 duration-300 ease-in-out">
+				{wallpapers.map((wallpaper, index) => (
+					<div
+						onClick={() => handleClick(wallpaper.id)}
+						key={index}
+						className="hover:scale-105 duration-300 ease-in-out"
+					>
 						<WallpaperCard wallpaperId={wallpaper.id} />
 					</div>
 				))}
 			</div>
 
-			{(isModalWallpaperUpdateOpen && selectedWallpaper != null) && (
-				<ModalWallpaperUpdate selectedWallpaper={selectedWallpaper} setIsOpen={setIsModalWallpaperUpdateOpen} setIsFetchWallpapers={setIsFetchWallpapers} />
+			{isModalWallpaperUpdateOpen && selectedWallpaper != null && (
+				<ModalWallpaperUpdate
+					selectedWallpaper={selectedWallpaper}
+					setIsOpen={setIsModalWallpaperUpdateOpen}
+					setIsFetchWallpapers={setIsFetchWallpapers}
+				/>
 			)}
 		</div>
 	);

@@ -1,118 +1,93 @@
-import { WallpaperProps, WallpaperUpdateProps } from "../types/Wallpaper";
+import {
+	WallpaperProps,
+	WallpaperUpdateProps,
+} from "@/app/wallpaper/types/Wallpaper";
+import { Result, safeAsync } from "@/lib/result";
 
-export async function fetchWallpapers(
-	setWallpapers: React.Dispatch<React.SetStateAction<WallpaperProps[] | null>>
-) {
-	console.debug("fetchWallpapers");
-	try {
+export function fetchWallpapers(): Promise<Result<WallpaperProps[]>> {
+	return safeAsync(async () => {
 		const res = await fetch("/api/wallpaper", {
 			method: "GET",
 			credentials: "include",
-			cache: "no-store",
 		});
 
-		console.debug("res");
-		console.debug(res);
-
-		const data = await res.json()
+		const data = await res.json();
 		if (!res.ok) {
-			console.error(`res error: ${JSON.stringify(data)}`);
+			throw new Error(`${data.message}`);
 		}
-		else {
-			console.debug("data");
-			console.debug(data);
-			if (!Array.isArray(data) || data.length == 0) {
-				setWallpapers(null);
-			}
-			else {
-				setWallpapers(data
-					.sort((a, b) => a.id - b.id)
-					.map((item: WallpaperProps) => ({
-						id: item.id,
-						name: item.name,
-						hash: item.hash,
-						size: item.size,
-						x: item.x,
-						y: item.y,
-						w: item.w,
-						h: item.h,
-						color: item.color,
-						shadow: item.shadow
-					})));
-			}
-			return;
-		}
-	}
-	catch (err) {
-		console.error(`API call failed: ${err}`);
-		return `${err}`;
-	}
 
-	setWallpapers([]);
+		if (Array.isArray(data) && data.length > 0) {
+			const wallpapers: WallpaperProps[] = data
+				.sort((a, b) => a.id - b.id)
+				.map((item: WallpaperProps) => ({
+					id: item.id,
+					name: item.name,
+					hash: item.hash,
+					size: item.size,
+					x: item.x,
+					y: item.y,
+					w: item.w,
+					h: item.h,
+					color: item.color,
+					shadow: item.shadow,
+				}));
+			return wallpapers;
+		}
+
+		return [];
+	}, "fetchWallpaper");
 }
 
-export async function fetchWallpaperDelete(id: number): Promise<string> {
-	console.debug("fetchWallpaperDelete");
-	try {
+export function fetchWallpaperDelete(id: number): Promise<Result<void>> {
+	return safeAsync(async () => {
 		const res = await fetch(`/api/wallpaper/${id}`, {
 			method: "DELETE",
 			headers: {
 				"Content-Type": "application/json",
 			},
 			credentials: "include",
-			cache: "no-store",
 		});
-		
-		console.debug("res");
-		console.debug(res);
 
 		if (!res.ok) {
-			const j = await res.json();
-			
-			console.error(`res error: ${JSON.stringify(j)}`);
-
-			return j.message;
+			const data = await res.json();
+			throw new Error(`${data.message}`);
 		}
-	}
-	catch (err) {
-		console.error(`API call failed: ${err}`);
-		return `${err}`;
-	}
-
-	// success
-	return "";
+	}, "fetchWallpaperDelete");
 }
 
-export async function fetchWallpaperUpdate(id: number, wallpaperUpdateProps: WallpaperUpdateProps): Promise<string> {
-	console.debug("fetchWallpaperUpdate");
-	console.debug(wallpaperUpdateProps);
-	try {
-		const res = await fetch(`/api/wallpaper/${id}`, {
+export function fetchWallpaperUpdate(
+	wallpaperUpdateProps: WallpaperUpdateProps
+): Promise<Result<void>> {
+	return safeAsync(async () => {
+		const res = await fetch(`/api/wallpaper/${wallpaperUpdateProps.id}`, {
 			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json",
 			},
 			credentials: "include",
-			cache: "no-store",
-			body: JSON.stringify(wallpaperUpdateProps)
+			body: JSON.stringify(wallpaperUpdateProps),
 		});
-		
-		console.debug("res");
-		console.debug(res);
 
 		if (!res.ok) {
-			const j = await res.json();
-			
-			console.error(`res error: ${JSON.stringify(j)}`);
-
-			return j.message;
+			const data = await res.json();
+			throw new Error(`${data.message}`);
 		}
-	}
-	catch (err) {
-		console.error(`API call failed: ${err}`);
-		return `${err}`;
-	}
+	}, "fetchWallpaperUpdate");
+}
 
-	// success
-	return "";
+export function fetchWallpaperUpload(
+	payload: FormData
+): Promise<Result<void>> {
+	return safeAsync(async () => {
+			const res = await fetch("/api/wallpaper/upload", {
+				method: "POST",
+				credentials: "include",
+				body: payload,
+			});
+			
+			if (!res.ok) {
+				const data = await res.json();
+				throw new Error(`${data.message}`);
+			}
+	}, "fetchWallpaperUpload");	
 }

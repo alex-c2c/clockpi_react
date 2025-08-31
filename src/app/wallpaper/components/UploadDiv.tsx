@@ -1,8 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, TouchList } from "react";
-import { shortenFileName } from "@/lib/utils";
 import * as Tooltip from "@radix-ui/react-tooltip";
+
+import { fetchWallpaperUpload } from "@/app/wallpaper/lib/api";
+import { shortenFileName } from "@/lib/utils";
+import { Result } from "@/lib/result";
 
 export default function UploadDiv() {
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -113,7 +116,13 @@ export default function UploadDiv() {
 		ctx.filter = "none";
 
 		// Foreground image
-		ctx.drawImage(img, offset.x, offset.y, img.width * scale, img.height * scale);
+		ctx.drawImage(
+			img,
+			offset.x,
+			offset.y,
+			img.width * scale,
+			img.height * scale
+		);
 	}, [offset, scale]);
 
 	/* ----------------- Mouse & Touch ----------------- */
@@ -131,7 +140,7 @@ export default function UploadDiv() {
 	const stopDragging = () => setIsDragging(false);
 
 	const handleZoom = (e: React.WheelEvent<HTMLCanvasElement>) => {
-		e.preventDefault();
+		//e.preventDefault();
 		const delta = e.deltaY < 0 ? 0.05 : -0.05;
 		setScale((s) => Math.min(Math.max(s + delta, 0.1), 5));
 	};
@@ -227,30 +236,28 @@ export default function UploadDiv() {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!selectedFile) return;
-
+		
+		const img: HTMLImageElement | null = imgRef.current;
+		const canvas: HTMLCanvasElement | null = canvasRef.current;
+		
+		if (!canvas || !img || !selectedFile) return;
+		
+		// scale represents the image width as a percent of the canvas width (fixed size)
+		const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
+		const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
 		const formData = new FormData();
 		formData.append("file", selectedFile);
-		formData.append("scale", JSON.stringify(scale));
-		formData.append("offsetX", JSON.stringify(offset.x));
-		formData.append("offsetY", JSON.stringify(offset.y));
-
-		try {
-			const res = await fetch("/api/wallpaper/upload", {
-				method: "POST",
-				body: formData,
-			});
-			if (res.ok) {
-				resetFile();
-				setUploadStatus("✅ Wallpaper uploaded successfully!");
-			} else {
-				const j = await res.json();
-				console.error(j.message);
-				setUploadStatus("❌ Upload failed.");
-			}
-		} catch (err) {
-			console.error(err);
-			setUploadStatus("❌ Something went wrong.");
+		formData.append("scale", JSON.stringify((img.width * scale) / canvasWidth));
+		formData.append("xPercent", JSON.stringify(offset.x / canvasWidth));
+		formData.append("yPercent", JSON.stringify(offset.y / canvasHeight));
+		
+		const result: Result<void> = await fetchWallpaperUpload(formData);
+		if (!result.success) {
+			const errMsg: string = result.error;
+			setUploadStatus(`❌ Upload failed: ${errMsg}`);
+		} else {
+			resetFile();
+			setUploadStatus("✅ Wallpaper uploaded successfully!");
 		}
 	};
 
@@ -312,7 +319,10 @@ export default function UploadDiv() {
 			</h2>
 			<div className="w-full h-px bg-white opacity-30 mb-6" />
 
-			<form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
+			<form
+				onSubmit={handleSubmit}
+				className="w-full flex flex-col gap-4"
+			>
 				{uploadStatus && (
 					<div className="w-full flex items-center justify-between text-white bg-stone-600 px-4 py-2 rounded-lg shadow-md">
 						<p className="mr-4">{uploadStatus}</p>
@@ -333,8 +343,12 @@ export default function UploadDiv() {
 					onClick={() => inputRef.current?.click()}
 					className="w-full border-2 border-dashed border-white rounded-xl p-6 text-white text-center cursor-pointer hover:bg-stone-700 transition"
 				>
-					<p className="text-white">Drag & drop image here, or click to select</p>
-					<p className="text-sm mt-2 text-stone-300">{fileDispName}</p>
+					<p className="text-white">
+						Drag & drop image here, or click to select
+					</p>
+					<p className="text-sm mt-2 text-stone-300">
+						{fileDispName}
+					</p>
 				</div>
 
 				<input
@@ -364,7 +378,11 @@ export default function UploadDiv() {
 											stroke="currentColor"
 											className="w-5 h-5 text-white hover:text-red-400 transition-colors duration-200"
 										>
-											<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												d="M6 18L18 6M6 6l12 12"
+											/>
 										</svg>
 									</button>
 								</Tooltip.Trigger>
@@ -391,7 +409,9 @@ export default function UploadDiv() {
 								//width={800}
 								//height={480}
 								className="w-full h-full border rounded-lg bg-black touch-none"
-								style={{ cursor: isDragging ? "grabbing" : "grab" }}
+								style={{
+									cursor: isDragging ? "grabbing" : "grab",
+								}}
 								onMouseDown={startDragging}
 								onMouseMove={onDrag}
 								onMouseUp={stopDragging}
@@ -402,7 +422,6 @@ export default function UploadDiv() {
 								onTouchEnd={handleTouchEnd}
 							/>
 						</div>
-
 					</div>
 				)}
 
@@ -413,16 +432,33 @@ export default function UploadDiv() {
 							<button
 								type="button"
 								onClick={() =>
-									animateTo({ x: offset.x, y: (canvasRef.current!.height / (window.devicePixelRatio || 1) - imgRef.current!.height * scale) / 2 })
-								} className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+									animateTo({
+										x: offset.x,
+										y:
+											(canvasRef.current!.height /
+												(window.devicePixelRatio || 1) -
+												imgRef.current!.height *
+													scale) /
+											2,
+									})
+								}
+								className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
 							>
 								Center Vertically
 							</button>
 							<button
 								type="button"
 								onClick={() =>
-									animateTo({ x: (canvasRef.current!.width / (window.devicePixelRatio || 1) - imgRef.current!.width * scale) / 2, y: offset.y })
-								} className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+									animateTo({
+										x:
+											(canvasRef.current!.width /
+												(window.devicePixelRatio || 1) -
+												imgRef.current!.width * scale) /
+											2,
+										y: offset.y,
+									})
+								}
+								className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
 							>
 								Center Horizontally
 							</button>
@@ -430,14 +466,33 @@ export default function UploadDiv() {
 								type="button"
 								onClick={() => {
 									const canvas = canvasRef.current!;
-									const w = canvas.width / (window.devicePixelRatio || 1);
-									const h = canvas.height / (window.devicePixelRatio || 1);
-									const targetScale = Math.min(w / imgRef.current!.width, h / imgRef.current!.height);
+									const w =
+										canvas.width /
+										(window.devicePixelRatio || 1);
+									const h =
+										canvas.height /
+										(window.devicePixelRatio || 1);
+									const targetScale = Math.min(
+										w / imgRef.current!.width,
+										h / imgRef.current!.height
+									);
 									animateTo(
-										{ x: (w - imgRef.current!.width * targetScale) / 2, y: (h - imgRef.current!.height * targetScale) / 2 },
+										{
+											x:
+												(w -
+													imgRef.current!.width *
+														targetScale) /
+												2,
+											y:
+												(h -
+													imgRef.current!.height *
+														targetScale) /
+												2,
+										},
 										targetScale
 									);
-								}} className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+								}}
+								className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
 							>
 								Stretch To Fit
 							</button>
@@ -445,14 +500,33 @@ export default function UploadDiv() {
 								type="button"
 								onClick={() => {
 									const canvas = canvasRef.current!;
-									const w = canvas.width / (window.devicePixelRatio || 1);
-									const h = canvas.height / (window.devicePixelRatio || 1);
-									const targetScale = Math.max(w / imgRef.current!.width, h / imgRef.current!.height);
+									const w =
+										canvas.width /
+										(window.devicePixelRatio || 1);
+									const h =
+										canvas.height /
+										(window.devicePixelRatio || 1);
+									const targetScale = Math.max(
+										w / imgRef.current!.width,
+										h / imgRef.current!.height
+									);
 									animateTo(
-										{ x: (w - imgRef.current!.width * targetScale) / 2, y: (h - imgRef.current!.height * targetScale) / 2 },
+										{
+											x:
+												(w -
+													imgRef.current!.width *
+														targetScale) /
+												2,
+											y:
+												(h -
+													imgRef.current!.height *
+														targetScale) /
+												2,
+										},
 										targetScale
 									);
-								}} className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+								}}
+								className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
 							>
 								Stretch To Fill
 							</button>

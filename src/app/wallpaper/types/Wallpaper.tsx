@@ -12,6 +12,7 @@ export type WallpaperProps = {
 };
 
 export type WallpaperUpdateProps = {
+	id: number;
 	x: number;
 	y: number;
 	w: number;
