@@ -25,7 +25,8 @@ function fetchScheduleStatus(): Promise<Result<boolean>> {
 }
 
 export default async function ScheduleDiv() {
-	const isSleep = await fetchScheduleStatus();
+	const result: Result<boolean> = await fetchScheduleStatus();
+	const isSleep: boolean = result.success ? result.data : false;
 
 	return (
 		<div className="w-full max-w-4xl p-4 sm:p-6 mx-auto bg-stone-800 rounded-2xl flex flex-col justify-center">
@@ -38,12 +39,12 @@ export default async function ScheduleDiv() {
 					Current Status:
 				</p>
 				{isSleep ? (
-					<p className="text-l text-green-400 bg-gray-500 rounded-2xl px-2 py-0.5 mb-4 tracking-wider font-extrabold">
-						Sleeping
+					<p className="text-l text-green-400 bg-gray-500 rounded-2xl px-4 py-1 mb-4 tracking-widest font-extrabold">
+						SLEEPING 💤
 					</p>
 				) : (
-					<p className="text-l text-white bg-gray-500 rounded-2xl px-2 py-0.5 mb-4 tracking-wider font-extrabold">
-						Awake
+					<p className="text-l text-white bg-gray-500 rounded-2xl px-4 py-1 mb-4 tracking-widest font-extrabold">
+						AWAKE
 					</p>
 				)}
 			</div>
