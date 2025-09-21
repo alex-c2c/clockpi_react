@@ -1,4 +1,4 @@
-export type User = {
+export type UserProp = {
 	id: number,
 	username: string,
 	dispName: string,

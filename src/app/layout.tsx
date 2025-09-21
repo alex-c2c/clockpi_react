@@ -6,7 +6,7 @@ import "slick-carousel/slick/slick-theme.css";
 
 import Navbar from "@/components/Navbar";
 import { UserProvider } from "@/context/UserContext";
-import { User } from "@/types/User";
+import { UserProp } from "@/types/User";
 import { headers } from "next/headers";
 
 const roboto = Roboto({
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
 	const userHeader: string | null = (await headers()).get("x-user");
-	const user: User | null = userHeader ? JSON.parse(userHeader) : null;
+	const user: UserProp | null = userHeader ? JSON.parse(userHeader) : null;
 	
 	return (		
 		<html lang="en" className="h-screen">

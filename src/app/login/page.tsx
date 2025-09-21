@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/context/UserContext";
-import { User } from "@/types/User";
+import { UserProp } from "@/types/User";
 import { Result, safeAsync } from "@/lib/result";
 
-function fetchLogin(username: string, password: string): Promise<Result<User>> {
+function fetchLogin(username: string, password: string): Promise<Result<UserProp>> {
 	return safeAsync(async () => {
 		const res = await fetch("/api/auth/login", {
 			method: "POST",
@@ -40,7 +40,7 @@ export default function LoginPage() {
 		const result = await fetchLogin(username, password);
 		
 		if (result.success) {
-			const user: User = result.data;
+			const user: UserProp = result.data;
 			setUser(user);
 			router.push(redirectPath);
 		}

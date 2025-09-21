@@ -49,6 +49,7 @@ export default function NavbarName() {
 		const result = await fetchLogout();
 		if (result.success) {
 			setUser(null);
+			setIsOpen(false);
 			router.push("/");
 		}
 
@@ -64,7 +65,7 @@ export default function NavbarName() {
 			<div ref={dropdownRef} className="relative">
 				<button
 					onClick={() => setIsOpen((prev) => !prev)}
-					className="flex items-center gap-2 text-sm font-medium hover:text-gray-300"
+					className="flex items-center gap-2 text-lg hover:text-neutral-400"
 				>
 					Hello, {user?.dispName}
 					<span
@@ -77,16 +78,19 @@ export default function NavbarName() {
 				</button>
 
 				<div
-					className={`absolute right-0 mt-2 w-40 bg-stone-600 text-white rounded-xl shadow-lg z-10 transform transition-all duration-200 origin-top ${
+					className={`absolute right-0 mt-2 p-1 w-full bg-stone-600 text-white rounded-xl shadow-lg z-10 transform transition-all duration-200 origin-top ${
 						isOpen
 							? "scale-100 opacity-100"
 							: "scale-95 opacity-0 pointer-events-none"
 					}`}
 				>
 					<button
-						onClick={handleLogout}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleLogout();
+						}}
 						disabled={loading}
-						className={`w-full text-left px-4 py-2 text-sm rounded-xl ${
+						className={`w-full text-left px-4 py-1 text-lg rounded-xl ${
 							loading
 								? "text-white cursor-not-allowed"
 								: "hover:bg-stone-700"
@@ -101,7 +105,7 @@ export default function NavbarName() {
 		return (
 			<button
 				onClick={handleLogin}
-				className="text-l font-medium hover:text-gray-300"
+				className="flex items-center gap-2 text-lg hover:text-neutral-400"
 			>
 				Login
 			</button>

@@ -1,5 +1,5 @@
 import { cookies } from "next/headers"
-import { User } from "@/types/User";
+import { UserProp } from "@/types/User";
 
 export default async function fetchSessionUser() {
 	const session = (await cookies()).get("session")
@@ -19,7 +19,7 @@ export default async function fetchSessionUser() {
 	}
 
 	const data = await res.json();
-	const user: User = data;
+	const user: UserProp = data;
 
 	return user;
 }

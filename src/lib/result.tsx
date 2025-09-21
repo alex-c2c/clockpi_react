@@ -8,6 +8,7 @@ export async function safeAsync<T>(
 	context: string = ""
 ): Promise<Result<T>>
 {
+	console.log(`[${context}] calling API...`);
 	try {
 		const data = await fn();
 		return { success: true, data };

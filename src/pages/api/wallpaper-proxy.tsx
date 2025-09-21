@@ -2,13 +2,17 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 // Cannot use cookies as it will be called outside of a reqquest scope
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-	const { id } = req.query;
+	const { deviceId, wallpaperId } = req.query;
 
-	if (!id || typeof id !== "string") {
+	if (!deviceId || typeof deviceId !== "string") {
+		return res.status(400).json({ error: "Missing or invalid device id" });
+	}
+	
+	if (!wallpaperId || typeof wallpaperId !== "string") {
 		return res.status(400).json({ error: "Missing or invalid wallpaper id" });
 	}
 
-	const url = `${process.env.FLASK_URL}/wallpaper/file?id=${id}`;
+	const url = `${process.env.FLASK_URL}/device/${deviceId}/wallpaper/file?id=${wallpaperId}`;
 
 	try {
 		const flaskRes = await fetch(url, {
