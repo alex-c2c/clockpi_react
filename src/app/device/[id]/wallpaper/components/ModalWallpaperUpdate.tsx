@@ -257,20 +257,6 @@ export default function ModalWallpaperUpdate({
 	};
 
 	useEffect(() => {
-		const handleEscKeyDown = (event: KeyboardEvent) => {
-			if (event.key === "Escape") {
-				setIsOpen(false);
-			}
-		};
-
-		window.addEventListener("keydown", handleEscKeyDown);
-
-		return () => {
-			window.removeEventListener("keydown", handleEscKeyDown);
-		};
-	}, [setIsOpen]);
-
-	useEffect(() => {
 		window.addEventListener("mousemove", handleMouseMove);
 		window.addEventListener("mouseup", stopDragOrResize);
 		window.addEventListener("touchmove", handleTouchMove);

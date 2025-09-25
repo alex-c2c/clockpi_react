@@ -57,6 +57,23 @@ export function fetchWallpaperDelete(deviceId: number, wallpaperId: number): Pro
 	}, "fetchWallpaperDelete");
 }
 
+export function fetchWallpaperDeleteAll(deviceId: number): Promise<Result<void>> {
+	return safeAsync(async () => {
+		const res = await fetch(`/api/device/${deviceId}/wallpaper/delete-all`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: "include",
+		});
+
+		if (!res.ok) {
+			const data = await res.json();
+			throw new Error(`${data.message}`);
+		}
+	}, "fetchWallpaperDeleteAll");
+}
+
 export function fetchWallpaperUpdate(
 	deviceId: number,
 	wallpaperUpdateProps: WallpaperUpdateProps
