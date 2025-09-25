@@ -47,10 +47,6 @@ export default function WallpaperPage() {
 		}
 	};
 
-	const clearAllWallpapers = () => {
-		setWallpaperList([]);
-	};
-
 	useEffect(() => {
 		if (!isFetchDevice) return;
 
