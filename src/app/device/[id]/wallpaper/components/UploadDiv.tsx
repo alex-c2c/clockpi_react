@@ -10,10 +10,14 @@ import { Result } from "@/lib/result";
 
 export default function UploadDiv({
 	deviceId,
+	deviceWidth,
+	deviceHeight,
 	setIsFetchWallpaperList,
 
 }:{
 	deviceId: number;
+	deviceWidth: number;
+	deviceHeight: number;
 	setIsFetchWallpaperList: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -411,7 +415,7 @@ export default function UploadDiv({
 
 						<div
 							className="relative w-full"
-							style={{ aspectRatio: "800 / 480" }}
+							style={{ aspectRatio: `${deviceWidth} / ${deviceHeight}` }}
 						>
 							<canvas
 								ref={canvasRef}

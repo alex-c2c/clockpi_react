@@ -164,6 +164,8 @@ export default function WallpaperPage() {
 					{/* Upload */}
 					<UploadDiv
 						deviceId={deviceId}
+						deviceWidth={device.width}
+						deviceHeight={device.height}
 						setIsFetchWallpaperList={setIsFetchWallpaperList}
 					/>
 
