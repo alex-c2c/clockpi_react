@@ -9,6 +9,7 @@ import CarouselImage from "./CarouselImage";
 
 import Slider from "react-slick";
 import { DeviceProps } from "../types/Device";
+import { DeviceOrientation } from "../types/enums";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function NextArrow(props: any) {
@@ -43,8 +44,8 @@ export default function CarouselDiv({
 		className: "center",
 		centerMode: true,
 		infinite: true,
-		centerPadding: "80px",
-		slidesToShow: 1,
+		centerPadding: deviceProps.orientation === DeviceOrientation.Horizontal ? "80px" : "0px",
+		slidesToShow: deviceProps.orientation === DeviceOrientation.Horizontal ? 1 : 3,
 		speed: 500,
 		dots: false,
 		nextArrow: <NextArrow />,
@@ -59,16 +60,17 @@ export default function CarouselDiv({
 			<div className="w-full h-px bg-white opacity-30 mb-4 sm:mb-6" />
 			<div className="w-full flex items-center justify-center mb-2 sm:mb-4">
 				<Slider {...settings} className="w-full">
-						{deviceProps.queue?.map((id, index) => (
-							<div key={index} className="">
-								<CarouselImage
-									index={index}
-									deviceId={deviceProps.id}
-									wallpaperId={id}
-								/>
-							</div>
-						))}
-					</Slider>
+					{deviceProps.queue?.map((id, index) => (
+						<div key={index} className="">
+							<CarouselImage
+								index={index}
+								deviceId={deviceProps.id}
+								orientation={deviceProps.orientation}
+								wallpaperId={id}
+							/>
+						</div>
+					))}
+				</Slider>
 			</div>
 			<div className="flex gap-4">
 				<ButtonWallpaperShuffle deviceId={deviceProps.id} setIsFetchDevice={setIsFetchDevice} />

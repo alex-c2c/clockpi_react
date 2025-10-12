@@ -1,12 +1,15 @@
 import { useState } from "react";
+import { DeviceOrientation } from "../types/enums";
 
 /* eslint-disable @next/next/no-img-element */
 export default function CarouselImage({
 	deviceId,
+	orientation,
 	wallpaperId,
 	index,
 }: {
 	deviceId: number;
+	orientation: DeviceOrientation;
 	wallpaperId: number;
 	index: number;
 }) {
@@ -27,7 +30,9 @@ export default function CarouselImage({
 						className={`absolute ${
 							index === 0
 								? "top-1 left-1 bg-green-400 text-white text-l sm:text-xl px-2 py-0 rounded-tl-2xl rounded-br-md z-100"
-								: "top-4 sm:top-7 left-6 sm:left-11 bg-neutral-800 text-white text-l sm:text-xl px-2 py-0 rounded-full z-100"
+								: orientation === DeviceOrientation.Horizontal ? 
+									"top-4 sm:top-7 left-6 sm:left-11 bg-neutral-800 text-white text-l sm:text-xl px-2 py-0 rounded-full z-100" : 
+									"top-4 sm:top-8 left-6 sm:left-6 bg-neutral-800 text-white text-l sm:text-xl px-2 py-0 rounded-full z-100"
 						}`}
 					>
 						{index + 1}
