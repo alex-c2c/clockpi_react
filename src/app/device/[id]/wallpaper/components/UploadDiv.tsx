@@ -235,6 +235,7 @@ export default function UploadDiv({
 		setUploadStatus("");
 	};
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		e.preventDefault();
 		const file = e.target.files?.[0];
 		if (file) handleFile(file);
 	};
