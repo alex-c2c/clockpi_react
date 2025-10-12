@@ -13,8 +13,7 @@ export default function UploadDiv({
 	deviceWidth,
 	deviceHeight,
 	setIsFetchWallpaperList,
-
-}:{
+}: {
 	deviceId: number;
 	deviceWidth: number;
 	deviceHeight: number;
@@ -28,6 +27,7 @@ export default function UploadDiv({
 	const [fileDispName, setFileDispName] = useState("No file chosen");
 	const [previewURL, setPreviewURL] = useState<string | null>(null);
 	const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+	const [isUploading, setIsUploading] = useState<boolean>(false);
 
 	const [isDragging, setIsDragging] = useState(false);
 	const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -241,30 +241,41 @@ export default function UploadDiv({
 	};
 	const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault();
+		if (isUploading) return;
 		const file = e.dataTransfer.files?.[0];
 		if (file) handleFile(file);
 	};
 	const handleDragOver = (e: React.DragEvent<HTMLDivElement>) =>
 		e.preventDefault();
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleUploadClicked = async (e: React.FormEvent) => {
 		e.preventDefault();
 		
+		if (isUploading) return;
+
 		const img: HTMLImageElement | null = imgRef.current;
 		const canvas: HTMLCanvasElement | null = canvasRef.current;
-		
+
 		if (!canvas || !img || !selectedFile) return;
-		
+
+		setIsUploading(true);
+
 		// scale represents the image width as a percent of the canvas width (fixed size)
 		const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
 		const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
 		const formData = new FormData();
 		formData.append("file", selectedFile);
-		formData.append("imgScalePer", JSON.stringify((img.width * scale) / canvasWidth));
+		formData.append(
+			"imgScalePer",
+			JSON.stringify((img.width * scale) / canvasWidth)
+		);
 		formData.append("xPosPer", JSON.stringify(offset.x / canvasWidth));
 		formData.append("yPosPer", JSON.stringify(offset.y / canvasHeight));
-		
-		const result: Result<void> = await fetchWallpaperUpload(deviceId, formData);
+
+		const result: Result<void> = await fetchWallpaperUpload(
+			deviceId,
+			formData
+		);
 		if (!result.success) {
 			const errMsg: string = result.error;
 			setUploadStatus(`❌ Upload failed: ${errMsg}`);
@@ -273,6 +284,8 @@ export default function UploadDiv({
 			setUploadStatus("✅ Wallpaper uploaded successfully!");
 			setIsFetchWallpaperList(true);
 		}
+
+		setIsUploading(false);
 	};
 
 	/* ----------------- Effects ----------------- */
@@ -334,7 +347,7 @@ export default function UploadDiv({
 			<div className="w-full h-px bg-white opacity-30 mb-6" />
 
 			<form
-				onSubmit={handleSubmit}
+				onSubmit={handleUploadClicked}
 				className="w-full flex flex-col gap-4"
 			>
 				{uploadStatus && (
@@ -355,7 +368,8 @@ export default function UploadDiv({
 					onDrop={handleDrop}
 					onDragOver={handleDragOver}
 					onClick={() => inputRef.current?.click()}
-					className="w-full border-2 border-dashed border-white rounded-xl p-6 text-white text-center cursor-pointer hover:bg-stone-700 transition"
+					className={`w-full border-2 border-dashed border-white rounded-xl p-6 text-white text-center cursor-pointer transition
+						${isUploading ? "text-white" : "text-white hover:bg-stone-700 "}`}
 				>
 					<p className="text-white">
 						Drag & drop image here, or click to select
@@ -371,6 +385,7 @@ export default function UploadDiv({
 					ref={inputRef}
 					onChange={handleFileChange}
 					className="hidden"
+					disabled={isUploading}
 				/>
 
 				{/* Image Preview */}
@@ -382,6 +397,7 @@ export default function UploadDiv({
 									<button
 										type="button"
 										onClick={resetFile}
+										disabled={isUploading}
 										className="absolute top-2 right-2 z-10 bg-black bg-opacity-60 hover:bg-opacity-80 rounded-full p-1"
 									>
 										<svg
@@ -390,7 +406,12 @@ export default function UploadDiv({
 											viewBox="0 0 24 24"
 											strokeWidth={2}
 											stroke="currentColor"
-											className="w-5 h-5 text-white hover:text-red-400 transition-colors duration-200"
+											className={`w-5 h-5 transition-colors duration-200
+												${
+													isUploading
+														? "text-white hover:text-stone-700"
+														: "text-white hover:text-red-400"
+												}`}
 										>
 											<path
 												strokeLinecap="round"
@@ -416,7 +437,9 @@ export default function UploadDiv({
 
 						<div
 							className="relative w-full"
-							style={{ aspectRatio: `${deviceWidth} / ${deviceHeight}` }}
+							style={{
+								aspectRatio: `${deviceWidth} / ${deviceHeight}`,
+							}}
 						>
 							<canvas
 								ref={canvasRef}
@@ -456,7 +479,13 @@ export default function UploadDiv({
 											2,
 									})
 								}
-								className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+								disabled={isUploading}
+								className={`w-full px-2 py-2 mb-4 rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out
+									${
+										isUploading
+											? "bg-stone-700 text-white hover:bg-stone-700"
+											: "bg-stone-600 text-white hover:bg-stone-700"
+									}`}
 							>
 								Center Vertically
 							</button>
@@ -472,7 +501,13 @@ export default function UploadDiv({
 										y: offset.y,
 									})
 								}
-								className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+								disabled={isUploading}
+								className={`w-full px-2 py-2 mb-4 rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out
+									${
+										isUploading
+											? "bg-stone-700 text-white hover:bg-stone-700"
+											: "bg-stone-600 text-white hover:bg-stone-700"
+									}`}
 							>
 								Center Horizontally
 							</button>
@@ -506,7 +541,13 @@ export default function UploadDiv({
 										targetScale
 									);
 								}}
-								className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+								disabled={isUploading}
+								className={`w-full px-2 py-2 mb-4 rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out
+									${
+										isUploading
+											? "bg-stone-700 text-white hover:bg-stone-700"
+											: "bg-stone-600 text-white hover:bg-stone-700"
+									}`}
 							>
 								Stretch To Fit
 							</button>
@@ -540,7 +581,13 @@ export default function UploadDiv({
 										targetScale
 									);
 								}}
-								className="w-full px-2 py-2 mb-4 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+								disabled={isUploading}
+								className={`w-full px-2 py-2 mb-4 rounded-xl shadow-lg flex items-center justify-center text-xs sm:text-lg font-semibold transition-all duration-200 ease-in-out
+									${
+										isUploading
+											? "bg-stone-700 text-white hover:bg-stone-700"
+											: "bg-stone-600 text-white hover:bg-stone-700"
+									}`}
 							>
 								Stretch To Fill
 							</button>
@@ -548,9 +595,15 @@ export default function UploadDiv({
 
 						<button
 							type="submit"
-							className="w-full px-2 py-2 bg-stone-600 text-white rounded-xl shadow-lg flex items-center justify-center text-2xl font-semibold transition-all duration-200 ease-in-out hover:bg-stone-700"
+							disabled={isUploading}
+							className={`w-full px-2 py-2 rounded-xl shadow-lg flex items-center justify-center text-2xl font-semibold transition-all duration-200 ease-in-out 
+								${
+									isUploading
+										? "bg-stone-700 text-white hover:bg-stone-700"
+										: "bg-stone-600 text-white hover:bg-stone-700"
+								}`}
 						>
-							Upload
+							{isUploading ? "Uploading..." : "Upload"}
 						</button>
 					</div>
 				)}
