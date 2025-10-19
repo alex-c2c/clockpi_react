@@ -3,7 +3,7 @@ import {DeviceProps, DeviceCreateProps, DeviceUpdateProps } from "@/app/device/[
 
 export function fetchDeviceList(): Promise<Result<DeviceProps[]>> {
 	return safeAsync(async () => {				
-		const res = await fetch("/api/device", {
+		const res = await fetch("/flask/device", {
 			method: "GET",
 			credentials: "include",
 		});
@@ -41,7 +41,7 @@ export function fetchDeviceList(): Promise<Result<DeviceProps[]>> {
 
 export function fetchDeviceCreate(deviceCreateProps: DeviceCreateProps): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch("/api/device/create", {
+		const res = await fetch("/flask/device/create", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -60,7 +60,7 @@ export function fetchDeviceCreate(deviceCreateProps: DeviceCreateProps): Promise
 
 export function fetchDeviceUpdate(deviceId: number, deviceUpdateProps: Partial<DeviceUpdateProps>): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}`, {
+		const res = await fetch(`/flask/device/${deviceId}`, {
 			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json",
@@ -80,7 +80,7 @@ export function fetchDeviceUpdate(deviceId: number, deviceUpdateProps: Partial<D
 
 export function fetchDeviceDelete(deviceId: number): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}`, {
+		const res = await fetch(`/flask/device/${deviceId}`, {
 			method: "DELETE",
 			credentials: "include",
 		});

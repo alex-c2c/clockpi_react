@@ -7,7 +7,7 @@ import { Result, safeAsync } from "@/lib/result";
 
 function fetchLogout(): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch("/api/auth/logout", {
+		const res = await fetch("/flask/auth/logout", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			credentials: "include",

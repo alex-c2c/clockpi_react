@@ -3,7 +3,7 @@ import { Result, safeAsync } from "@/lib/result";
 
 export function fetchScheduleList(deviceId: number): Promise<Result<ScheduleProps[]>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/schedules`, {
+		const res = await fetch(`/flask/device/${deviceId}/schedules`, {
 			method: "GET",
 			credentials: "include",
 		});
@@ -35,7 +35,7 @@ export function fetchScheduleCreate(
 	newSchedule: ScheduleProps
 ): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/schedule/create`, {
+		const res = await fetch(`/flask/device/${deviceId}/schedule/create`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -53,7 +53,7 @@ export function fetchScheduleCreate(
 
 export function fetchScheduleDelete(deviceId: number, scheduleId: number): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/schedule/${scheduleId}`, {
+		const res = await fetch(`/flask/device/${deviceId}/schedule/${scheduleId}`, {
 			method: "DELETE",
 			headers: {
 				"Content-Type": "application/json",
@@ -73,7 +73,7 @@ export async function fetchScheduleUpdate(
 	schedule: ScheduleProps
 ): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/schedule/${schedule.id}`, {
+		const res = await fetch(`/flask/device/${deviceId}/schedule/${schedule.id}`, {
 			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json",

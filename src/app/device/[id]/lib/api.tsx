@@ -5,7 +5,7 @@ import { DeviceProps } from "../types/Device"
 
 export function fetchDevice(deviceId: number): Promise<Result<DeviceProps>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}`, {
+		const res = await fetch(`/flask/device/${deviceId}`, {
 			method: "GET",
 			credentials: "include",
 		});
@@ -21,7 +21,7 @@ export function fetchDevice(deviceId: number): Promise<Result<DeviceProps>> {
 
 export function fetchQueue(deviceId: number): Promise<Result<number[]>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/queue`, {
+		const res = await fetch(`/flask/device/${deviceId}/queue`, {
 			method: "GET",
 			credentials: "include",
 		});
@@ -37,7 +37,7 @@ export function fetchQueue(deviceId: number): Promise<Result<number[]>> {
 
 export function fetchDevices(): Promise<Result<DeviceProps[]>> {
 	return safeAsync(async () => {
-		const res = await fetch("/api/device", {
+		const res = await fetch("/flask/device", {
 			method: "GET",
 			credentials: "include",
 		});
@@ -75,7 +75,7 @@ export function fetchDevices(): Promise<Result<DeviceProps[]>> {
 
 export function fetchQueueNext(deviceId: number): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/queue/next`, {
+		const res = await fetch(`/flask/device/${deviceId}/queue/next`, {
 			method: "POST",
 			credentials: "include",
 		});
@@ -89,7 +89,7 @@ export function fetchQueueNext(deviceId: number): Promise<Result<void>> {
 
 export function fetchQueueShuffle(deviceId: number): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/queue/shuffle`, {
+		const res = await fetch(`/flask/device/${deviceId}/queue/shuffle`, {
 			method: "POST",
 			credentials: "include",
 		});
@@ -103,7 +103,7 @@ export function fetchQueueShuffle(deviceId: number): Promise<Result<void>> {
 
 export function fetchEpdRefresh(deviceId: number): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/display/refresh`, {
+		const res = await fetch(`/flask/device/${deviceId}/display/refresh`, {
 			method: "POST",
 			credentials: "include",
 		});
@@ -117,7 +117,7 @@ export function fetchEpdRefresh(deviceId: number): Promise<Result<void>> {
 
 export function fetchEpdClear(deviceId: number): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/display/clear`, {
+		const res = await fetch(`/flask/device/${deviceId}/display/clear`, {
 			method: "POST",
 			credentials: "include",
 		});
@@ -131,7 +131,7 @@ export function fetchEpdClear(deviceId: number): Promise<Result<void>> {
 
 export function fetchSleepStatus(deviceId: number): Promise<Result<boolean>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/sleep-status`, {
+		const res = await fetch(`/flask/device/${deviceId}/sleep-status`, {
 			method: "GET",
 			credentials: "include",
 		});

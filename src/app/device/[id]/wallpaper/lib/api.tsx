@@ -7,7 +7,7 @@ import { Result, safeAsync } from "@/lib/result";
 
 export function fetchWallpaperList(deviceId: number): Promise<Result<WallpaperProps[]>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/wallpapers`, {
+		const res = await fetch(`/flask/device/${deviceId}/wallpapers`, {
 			method: "GET",
 			credentials: "include",
 		});
@@ -42,7 +42,7 @@ export function fetchWallpaperList(deviceId: number): Promise<Result<WallpaperPr
 
 export function fetchWallpaperDelete(deviceId: number, wallpaperId: number): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/wallpaper/${wallpaperId}`, {
+		const res = await fetch(`/flask/device/${deviceId}/wallpaper/${wallpaperId}`, {
 			method: "DELETE",
 			headers: {
 				"Content-Type": "application/json",
@@ -59,7 +59,7 @@ export function fetchWallpaperDelete(deviceId: number, wallpaperId: number): Pro
 
 export function fetchWallpaperDeleteAll(deviceId: number): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/wallpaper/delete-all`, {
+		const res = await fetch(`/flask/device/${deviceId}/wallpaper/delete-all`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -79,7 +79,7 @@ export function fetchWallpaperUpdate(
 	wallpaperUpdateProps: WallpaperUpdateProps
 ): Promise<Result<void>> {
 	return safeAsync(async () => {
-		const res = await fetch(`/api/device/${deviceId}/wallpaper/${wallpaperUpdateProps.id}`, {
+		const res = await fetch(`/flask/device/${deviceId}/wallpaper/${wallpaperUpdateProps.id}`, {
 			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json",
@@ -100,7 +100,7 @@ export function fetchWallpaperUpload(
 	payload: FormData
 ): Promise<Result<void>> {
 	return safeAsync(async () => {
-			const res = await fetch(`/api/device/${deviceId}/wallpaper/upload`, {
+			const res = await fetch(`/flask/device/${deviceId}/wallpaper/upload`, {
 				method: "POST",
 				credentials: "include",
 				body: payload,

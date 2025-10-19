@@ -8,7 +8,7 @@ import { Result, safeAsync } from "@/lib/result";
 
 function fetchLogin(username: string, password: string): Promise<Result<UserProp>> {
 	return safeAsync(async () => {
-		const res = await fetch("/api/auth/login", {
+		const res = await fetch("/flask/auth/login", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			credentials: "include",

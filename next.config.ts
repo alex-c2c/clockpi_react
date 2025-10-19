@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
 	compiler: {
-		removeConsole: false,	
+		removeConsole: false,
 	},
 	images: {
 		remotePatterns: [
@@ -18,15 +18,8 @@ const nextConfig: NextConfig = {
 	rewrites: async () => {
 		return [
 			{
-				source: "/api/image-proxy",
-				destination: "/api/image-proxy"	
-			},
-			{
-				source: "/api/:path*",
-				destination:
-					(process.env.NODE_ENV === "development" || process.env.NODE_ENV === "production")
-						? process.env.FLASK_URL + "/:path*"
-						: "/api/",
+				source: "/flask/:path*",
+				destination: process.env.FLASK_URL + "/:path*"
 			},
 		]
 	},
