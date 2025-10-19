@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
 			{
 				source: "/api/:path*",
 				destination:
-					process.env.NODE_ENV === "development"
+					(process.env.NODE_ENV === "development" || process.env.NODE_ENV === "production")
 						? process.env.FLASK_URL + "/:path*"
 						: "/api/",
 			},
