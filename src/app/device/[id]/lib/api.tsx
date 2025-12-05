@@ -65,6 +65,7 @@ export function fetchDevices(): Promise<Result<DeviceProps[]>> {
 					queue: item.queue,
 					isDrawGrid: item.isDrawGrid,
 					isEnabled: item.isEnabled,
+					isShowTime: item.isShowTime,
 				}));
 			return devices;
 		}
