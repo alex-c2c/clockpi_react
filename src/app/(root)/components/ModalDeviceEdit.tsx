@@ -188,44 +188,6 @@ export default function ModalDeviceEdit({
 							</select>
 						</div>
 
-						{/* Device Is Draw Grid? */}
-						<label className="self-center text-right tracking-wide font-semibold">
-							Draw Grid
-						</label>
-						<div className="flex items-center">
-							<label
-								onClick={(e) => e.stopPropagation()}
-								className="inline-flex items-center cursor-pointer"
-							>
-								<input
-									type="checkbox"
-									className="sr-only"
-									checked={device.isDrawGrid}
-									onChange={() =>
-										updateDeviceField(
-											"isDrawGrid",
-											!device.isDrawGrid
-										)
-									}
-								/>
-								<div
-									className={`w-12 h-6 rounded-full transition-colors duration-300 ${
-										device.isDrawGrid
-											? "bg-green-500"
-											: "bg-neutral-400"
-									}`}
-								>
-									<div
-										className={`w-6 h-6 bg-white rounded-full shadow transform transition-transform duration-300 ${
-											device.isDrawGrid
-												? "translate-x-6"
-												: "translate-x-0"
-										}`}
-									/>
-								</div>
-							</label>
-						</div>
-
 						{/* Device Is Enabled? */}
 						<label className="self-center text-right tracking-wide font-semibold">
 							Enable
@@ -258,6 +220,108 @@ export default function ModalDeviceEdit({
 											device.isEnabled
 												? "translate-x-6"
 												: "translate-x-0"
+										}`}
+									/>
+								</div>
+							</label>
+						</div>
+						
+						{/* Device Is Draw Grid? */}
+						<label className="self-center text-right tracking-wide font-semibold">
+							Draw Grid
+						</label>
+						<div className="flex items-center">
+							<label
+								onClick={(e) => e.stopPropagation()}
+								className="inline-flex items-center cursor-pointer"
+							>
+								<input
+									type="checkbox"
+									className="sr-only"
+									checked={device.isDrawGrid}
+									disabled={device.isEnabled === false}
+									onChange={() =>
+										updateDeviceField(
+											"isDrawGrid",
+											!device.isDrawGrid
+										)
+									}
+								/>
+								<div
+									className={`w-12 h-6 rounded-full transition-colors duration-300 ${
+										device.isEnabled ? (
+											device.isDrawGrid
+												? "bg-green-500"
+												: "bg-neutral-400"
+										 ) : (
+											device.isDrawGrid
+												? "bg-green-600"
+												: "bg-neutral-500"
+										 )
+									}`}
+								>
+									<div
+										className={`w-6 h-6 rounded-full shadow transform transition-transform duration-300 ${
+											device.isEnabled ? (
+												device.isDrawGrid
+													? "translate-x-6 bg-white"
+													: "translate-x-0 bg-white"									
+												) : (
+												device.isDrawGrid
+													? "translate-x-6 bg-neutral-400"
+													: "translate-x-0  bg-neutral-400"										
+											)
+										}`}
+									/>
+								</div>
+							</label>
+						</div>
+						
+						{/* Device Is Show Time? */}
+						<label className="self-center text-right tracking-wide font-semibold">
+							Show Time
+						</label>
+						<div className="flex items-center">
+							<label
+								onClick={(e) => e.stopPropagation()}
+								className="inline-flex items-center cursor-pointer"
+							>
+								<input
+									type="checkbox"
+									className="sr-only"
+									checked={device.isShowTime}
+									disabled={device.isEnabled === false}
+									onChange={() =>
+										updateDeviceField(
+											"isShowTime",
+											!device.isShowTime
+										)
+									}
+								/>
+								<div
+									className={`w-12 h-6 rounded-full transition-colors duration-300 ${
+										device.isEnabled ? (
+											device.isShowTime
+												? "bg-green-500"
+												: "bg-neutral-400"
+										 ) : (
+											device.isShowTime
+												? "bg-green-600"
+												: "bg-neutral-500"
+										 )
+									}`}
+								>
+									<div
+										className={`w-6 h-6 rounded-full shadow transform transition-transform duration-300 ${
+											device.isEnabled ? (
+												device.isShowTime
+													? "translate-x-6 bg-white"
+													: "translate-x-0 bg-white"									
+												) : (
+												device.isShowTime
+													? "translate-x-6 bg-neutral-400"
+													: "translate-x-0  bg-neutral-400"										
+											)
 										}`}
 									/>
 								</div>

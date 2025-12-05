@@ -15,6 +15,7 @@ export type DeviceProps = {
 	queue: number[];
 	isDrawGrid: boolean;
 	isEnabled: boolean;
+	isShowTime: boolean;
 };
 
 export type DeviceCreateProps = Pick<
@@ -35,4 +36,5 @@ export type DeviceUpdateProps = Pick<
 	| "orientation"
 	| "isDrawGrid"
 	| "isEnabled"
+	| "isShowTime"
 >;
